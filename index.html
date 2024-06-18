@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Voice Chat with Spatial Audio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/omnitone/1.0.0/omnitone.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        #controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #joinButton {
+            background-color: #28a745;
+            color: white;
+        }
+        #leaveButton {
+            background-color: #dc3545;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        audio {
+            display: block;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Voice Chat with Spatial Audio</h1>
+    <audio id="remoteAudio" controls autoplay></audio>
+    <div id="controls">
+        <button id="joinButton">参加</button>
+        <button id="leaveButton" disabled>退出</button>
+    </div>
+    <script>
+        const localAudio = document.createElement('audio');
+        localAudio.muted = true;
+        document.body.appendChild(localAudio);
+
+        const constraints = { audio: true, video: false };
+        let localStream;
+        let peerConnection;
+        const socket = io.connect();
+        let isJoined = false;
+
+        const gameSocket = new WebSocket('ws://localhost:8080');
+        let playerPositions = {};
+
+        gameSocket.onmessage = (event) => {
+            playerPositions = JSON.parse(event.data);
+            adjustVolume();
+        };
+
+        document.getElementById('joinButton').addEventListener('click', joinChat);
+        document.getElementById('leaveButton').addEventListener('click', leaveChat);
+
+        function joinChat() {
+            if (isJoined) return;
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(stream => {
+                    localAudio.srcObject = stream;
+                    localStream = stream;
+
+                    // Initialize WebRTC peer connection
+                    peerConnection = new RTCPeerConnection();
+
+                    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                    peerConnection.ontrack = event => {
+                        const remoteAudioElement = document.getElementById('remoteAudio');
+                        remoteAudioElement.srcObject = event.streams[0];
+                        setupSpatialAudio(remoteAudioElement);
+                    };
+
+                    peerConnection.onicecandidate = event => {
+                        if (event.candidate) {
+                            socket.emit('candidate', { candidate: event.candidate });
+                        }
+                    };
+
+                    socket.on('offer', async message => {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(message));
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        socket.emit('answer', { answer: answer });
+                    });
+
+                    socket.on('answer', message => {
+                        peerConnection.setRemoteDescription(new RTCSessionDescription(message));
+                    });
+
+                    socket.on('candidate', message => {
+                        peerConnection.addIceCandidate(new RTCIceCandidate(message.candidate));
+                    });
+
+                    socket.emit('join');
+                    createOffer();
+                    isJoined = true;
+                    document.getElementById('leaveButton').disabled = false;
+                }).catch(error => {
+                    console.error('Error accessing media devices.', error);
+                });
+        }
+
+        function leaveChat() {
+            if (!isJoined) return;
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            socket.emit('leave');
+            isJoined = false;
+            document.getElementById('leaveButton').disabled = true;
+        }
+
+        async function createOffer() {
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            socket.emit('offer', { offer: offer });
+        }
+
+        function setupSpatialAudio(remoteAudioElement) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const omnitone = Omnitone.createFOARenderer(audioContext);
+            const remoteAudioSource = audioContext.createMediaElementSource(remoteAudioElement);
+
+            omnitone.initialize()
+                .then(() => {
+                    remoteAudioSource.connect(omnitone.input);
+                    omnitone.output.connect(audioContext.destination);
+                    omnitone.setChannelMap([0, 1, 2, 3]);
+                })
+                .catch(error => {
+                    console.error('Error initializing Omnitone.', error);
+                });
+
+            remoteAudioElement.play();
+        }
+
+        function adjustVolume() {
+            // Assuming you have access to the local player's position and the remote player's position
+            const localPlayerPosition = playerPositions['localPlayer'];
+            const remotePlayerPosition = playerPositions['remotePlayer'];
+
+            if (localPlayerPosition && remotePlayerPosition) {
+                const distance = Math.sqrt(
+                    Math.pow(localPlayerPosition.x - remotePlayerPosition.x, 2) +
+                    Math.pow(localPlayerPosition.y - remotePlayerPosition.y, 2) +
+                    Math.pow(localPlayerPosition.z - remotePlayerPosition.z, 2)
+                );
+
+                const volume = Math.max(0, 1 - distance / 100); // Example distance-based volume adjustment
+                const remoteAudioElement = document.getElementById('remoteAudio');
+                remoteAudioElement.volume = volume;
+            }
+        }
+
+        socket.on('connect', () => {
+            console.log('Connected to signaling server');
+        });
+    </script>
+</body>
+</html>
