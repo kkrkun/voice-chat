@@ -1,0 +1,47 @@
+body {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.header-text {
+  margin: 0;
+  padding: 0;
+}
+
+#id-disp {
+  visibility: hidden;
+}
+
+#join, #NonMute-btn, #leave {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#join {
+  background: #dba142;
+}
+
+#NonMute-btn {
+  visibility: hidden;
+  background-color: #93ebeb;
+}
+
+#leave {
+  visibility: hidden;
+  background: #fc3f3f;
+}
+
+#button-area, #remote-media-area {
+  display: none;
+}
+
+.Id-Key {
+  margin-top: 50vh;
+  position: relative;
+}
+/*# sourceMappingURL=index.2cdaf7bc.css.map */
