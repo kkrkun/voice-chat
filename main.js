@@ -153,7 +153,7 @@ function SkyWay_main(token) {
 
                     setInterval(async () => {
                         try {
-                            const response = await fetch('https://d3a3-121-109-211-248.ngrok-free.app/getPositions');
+                            const response = await fetch('http://is-lecture.gl.at.ply.gg:26473/getPositions');
                             const positions = await response.json();
                             console.log('Received positions:', positions);
 
