@@ -195,7 +195,7 @@ async function SkyWay_main(token) {
                         };
             
                         // 定期的に位置情報を取得し、音量調節を行う
-                        setInterval(adjustVolumeForAll, 500);
+                        setInterval(adjustVolumeForAll, 1000);
                     } catch (error) {
                         console.error('Failed to subscribe to publication:', error);
                     }
