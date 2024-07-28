@@ -243,6 +243,27 @@ function calculateDistance(pos1, pos2) {
     );
 }
 
+async function fetchDistance() {
+    try {
+        const response = await fetch('https://kkryade1212.tcpexposer.com/getDistance');
+        if (!response.ok) {
+            throw new Error('Failed to fetch distance');
+        }
+        const data = await response.json();
+        return data.distance;
+    } catch (error) {
+        console.error('Error fetching distance:', error);
+        return 10; // デフォルト値
+    }
+}
+
+let maxDistance = 10; // 初期値
+
+fetchDistance().then(distance => {
+    maxDistance = distance;
+});
+
+
 function adjustVolume(mediaElement, pos1, pos2) {
     if (!pos1 || !pos2 || typeof pos1.x !== 'number' || typeof pos1.y !== 'number' || typeof pos1.z !== 'number' ||
         typeof pos2.x !== 'number' || typeof pos2.y !== 'number' || typeof pos2.z !== 'number') {
@@ -253,15 +274,14 @@ function adjustVolume(mediaElement, pos1, pos2) {
     }
 
     const distance = calculateDistance(pos1, pos2);
-    const maxDistance = 10; // 最大距離
     const minVolume = 0; // 最小音量を0に設定
-    volume = Math.max(minVolume, 1 - (distance / maxDistance));
+    const volume = Math.max(minVolume, 1 - (distance / maxDistance));
     if (volume == 0) {
         mediaElement.volume = minVolume; // デフォルトの最小音量
         mediaElement.muted = true; // ミュートにする
     } else {
         mediaElement.volume = volume; // 音量調節
-        mediaElement.muted = false; // ミュートにする
+        mediaElement.muted = false; // ミュートを解除
     }
     console.log(`now volume: ${volume}`);
     console.log(`Media element volume set to: ${mediaElement.volume}`);
