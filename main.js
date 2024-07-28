@@ -85,13 +85,8 @@ async function SkyWay_main(token) {
                 return;
             }
 
-            let audio = null;
-            try {
-                // マイクのオーディオストリームを作成
-                audio = await SkyWayStreamFactory.createMicrophoneAudioStream();
-            } catch (error) {
-                console.error("マイクのオーディオストリームを作成できませんでした:", error);
-            }
+            // マイクのオーディオストリームを作成
+            const audio = await SkyWayStreamFactory.createMicrophoneAudioStream();
 
             if (roomNameInput === '') return;
 
@@ -102,13 +97,9 @@ async function SkyWay_main(token) {
             });
             const me = await room.join({ name: userName });
 
-            let publication = null;
-            if (audio) {
-                publication = await me.publish(audio);
-                console.log(`${userName} is connected with audio`);
-            } else {
-                console.log(`${userName} is connected without audio`);
-            }
+            const publication = await me.publish(audio);
+
+            console.log(`${userName} is connected`);
 
             target.textContent = "ミュート解除中";
             NonMutebtn.style.backgroundColor = "rgb(147, 235, 235)";
@@ -129,7 +120,6 @@ async function SkyWay_main(token) {
             };
 
             NonMutebtn.addEventListener('click', async () => {
-                if (!publication) return;
                 isMuted = !isMuted;
                 if (isMuted) {
                     target.textContent = "ミュート中";
@@ -205,7 +195,7 @@ async function SkyWay_main(token) {
                         };
             
                         // 定期的に位置情報を取得し、音量調節を行う
-                        setInterval(adjustVolumeForAll, 1000);
+                        setInterval(adjustVolumeForAll, 500);
                     } catch (error) {
                         console.error('Failed to subscribe to publication:', error);
                     }
@@ -229,9 +219,7 @@ async function SkyWay_main(token) {
                 subscribeAndAttach(publication);
             });
 
-            if (publication) {
-                await publication.enable();
-            }
+            await publication.enable();
         };
     })();
 }
