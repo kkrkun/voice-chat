@@ -204,6 +204,7 @@ async function SkyWay_main(token) {
                             console.log('Received data:', event.data);
                             const data = JSON.parse(event.data);
                             const positions = data.positions;
+                            console.log(positions)
                             serverDistance = data.distance; // サーバーから受け取った distance を使用
                             console.log(serverDistance);
                             for (const [name, position] of Object.entries(positions)) {
