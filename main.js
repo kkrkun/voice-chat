@@ -50,7 +50,7 @@ const Token = new SkyWayAuthToken({
 }).encode("ektEwMWo27esBj8OPysenv96493Rh9Ze0wOAVa3ott4=");
 
 async function establishWebSocketConnection() {
-    const url = 'ws://kkryade1212.tcpexposer.com';
+    const url = 'wss://kkryade1212.tcpexposer.com';
     let socket;
 
     const retryInterval = 5000; // 5秒ごとに再試行
