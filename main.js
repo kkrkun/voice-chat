@@ -150,7 +150,7 @@ async function SkyWay_main(token) {
             me.leave();
             location.reload();
         };
-
+        const socket = await establishWebSocketConnection();
         NonMutebtn.addEventListener('click', async () => {
             isMuted = !isMuted;
             if (isMuted) {
@@ -197,14 +197,12 @@ async function SkyWay_main(token) {
 
                     // WebSocket接続の確立
                     try {
-                        const socket = await establishWebSocketConnection();
 
                         // メッセージを受信したときの処理
                         socket.addEventListener('message', (event) => {
                             console.log('Received data:', event.data);
                             const data = JSON.parse(event.data);
                             const positions = data.positions;
-                            console.log(positions)
                             serverDistance = data.distance; // サーバーから受け取った distance を使用
                             console.log(serverDistance);
                             for (const [name, position] of Object.entries(positions)) {
