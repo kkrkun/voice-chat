@@ -5,6 +5,7 @@ window.onload = async function () {
 };
 
 let serverDistance = 7; // デフォルトの distance
+let socket = null;
 
 const Token = new SkyWayAuthToken({
     jti: uuidV4(),
@@ -150,7 +151,7 @@ async function SkyWay_main(token) {
             me.leave();
             location.reload();
         };
-        const socket = await establishWebSocketConnection();
+
         NonMutebtn.addEventListener('click', async () => {
             isMuted = !isMuted;
             if (isMuted) {
@@ -195,36 +196,19 @@ async function SkyWay_main(token) {
                     stream.attach(newMedia);
                     remoteMediaArea.appendChild(newMedia);
 
-                    // WebSocket接続の確立
-                    try {
-
-                        // メッセージを受信したときの処理
-                        socket.addEventListener('message', (event) => {
-                            console.log('Received data:', event.data);
-                            const data = JSON.parse(event.data);
-                            const positions = data.positions;
-                            serverDistance = data.distance; // サーバーから受け取った distance を使用
-                            console.log(serverDistance);
-                            for (const [name, position] of Object.entries(positions)) {
-                                if (!userPositions[name]) {
-                                    userPositions[name] = { x: 0, y: 10000, z: 0 };
-                                } else if (!position || Object.keys(position).length === 0) {
-                                    userPositions[name] = { x: 0, y: 10000, z: 0 };
-                                } else {
-                                    userPositions[name] = position;
-                                }
-
-                                const mediaElement = document.querySelector(`[data-username="${name}"]`);
-                                if (name != myName.textContent && mediaElement && userPositions[myName.textContent] && userPositions[name] && position && Object.keys(position).length >= 1) {
-                                    console.log(`Adjusting volume for ${name}:`, userPositions[myName.textContent], userPositions[name]);
-                                    adjustVolume(mediaElement, userPositions[myName.textContent], userPositions[name]);
-                                }
-                            }
-                        });
-
-                    } catch (error) {
-                        console.error('Failed to establish WebSocket connection:', error);
+                    // WebSocket接続の確認とメッセージ処理の設定
+                    if (!socket || socket.readyState !== WebSocket.OPEN) {
+                        try {
+                            socket = await establishWebSocketConnection();
+                        } catch (error) {
+                            console.error('Failed to establish WebSocket connection:', error);
+                            return;
+                        }
                     }
+
+                    socket.addEventListener('message', (event) => {
+                        handleWebSocketMessage(event, userPositions, myName.textContent);
+                    });
 
                 } catch (error) {
                     console.error('Failed to subscribe to publication:', error);
@@ -253,43 +237,42 @@ async function SkyWay_main(token) {
     };
 }
 
+function handleWebSocketMessage(event, userPositions, myNameText) {
+    console.log('Received data:', event.data);
+    const data = JSON.parse(event.data);
+    const positions = data.positions;
+    serverDistance = data.distance; // サーバーから受け取った distance を使用
+    for (const [name, position] of Object.entries(positions)) {
+        if (!userPositions[name]) {
+            userPositions[name] = { x: 0, y: 10000, z: 0 };
+        } else if (!position || Object.keys(position).length === 0) {
+            userPositions[name] = { x: 0, y: 10000, z: 0 };
+        } else {
+            userPositions[name] = position;
+        }
+
+        const mediaElement = document.querySelector(`[data-username="${name}"]`);
+        if (name !== myNameText && mediaElement && userPositions[myNameText] && userPositions[name] && position && Object.keys(position).length >= 1) {
+            console.log(`Adjusting volume for ${name}:`, userPositions[myNameText], userPositions[name]);
+            adjustVolume(mediaElement, userPositions[myNameText], userPositions[name]);
+        }
+    }
+}
+
 navigator.permissions.query({ name: 'microphone' }).then((result) => {
-    if (result.state === 'granted') {
-        console.log("マイクを利用します");
-    } else {
-        console.log("マイクの権限取得エラーです");
-        alert("マイクを使用する権限を与えて下さい");
+    if (result.state === 'denied') {
+        alert("マイクへのアクセスが拒否されました");
+        location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
     }
 });
 
-function calculateDistance(pos1, pos2) {
-    return Math.sqrt(
-        Math.pow(pos1.x - pos2.x, 2) +
-        Math.pow(pos1.y - pos2.y, 2) +
-        Math.pow(pos1.z - pos2.z, 2)
+function adjustVolume(audioElement, userPosition, targetPosition) {
+    if (!userPosition || !targetPosition) return;
+    const distance = Math.sqrt(
+        Math.pow(userPosition.x - targetPosition.x, 2) +
+        Math.pow(userPosition.z - targetPosition.z, 2)
     );
-}
-
-function adjustVolume(mediaElement, pos1, pos2) {
-    if (!pos1 || !pos2 || typeof pos1.x !== 'number' || typeof pos1.y !== 'number' || typeof pos1.z !== 'number' ||
-        typeof pos2.x !== 'number' || typeof pos2.y !== 'number' || typeof pos2.z !== 'number') {
-        console.error('Invalid positions:', pos1, pos2);
-        mediaElement.volume = 0;
-        mediaElement.muted = true;
-        return;
-    }
-
-    const distance = calculateDistance(pos1, pos2);
-    const minVolume = 0;
-    const volume = Math.max(minVolume, 1 - (distance / serverDistance)); // serverDistance を使用
-    if (volume == 0) {
-        mediaElement.volume = minVolume;
-        mediaElement.muted = true;
-    } else {
-        mediaElement.volume = volume;
-        mediaElement.muted = false;
-    }
-    console.log(`now volume: ${volume}`);
-    console.log(`Media element volume set to: ${mediaElement.volume}`);
-    console.log(`Volume adjusted for ${mediaElement.getAttribute('data-username')}: ${mediaElement.volume}`);
+    const volume = Math.max(1 - (distance / serverDistance), 0);
+    audioElement.volume = volume;
+    console.log(`Volume adjusted for ${audioElement.getAttribute('data-username')}: ${volume}`);
 }
