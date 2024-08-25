@@ -196,11 +196,9 @@ async function SkyWay_main(token) {
     
                     // WebSocket接続の処理
                     socket.addEventListener('message', (event) => {
-                        console.log('Received data:', event.data);
                         const data = JSON.parse(event.data);
                         const positions = data.positions;
                         serverDistance = data.distance; // サーバーから受け取った distance を使用
-                        console.log(serverDistance);
                         for (const [name, position] of Object.entries(positions)) {
                             if (!userPositions[name]) {
                                 userPositions[name] = { x: 0, y: 10000, z: 0 };
@@ -212,7 +210,6 @@ async function SkyWay_main(token) {
     
                             const mediaElement = document.querySelector(`[data-username="${name}"]`);
                             if (name != myName.textContent && mediaElement && userPositions[myName.textContent] && userPositions[name] && position && Object.keys(position).length >= 1) {
-                                console.log(`Adjusting volume for ${name}:`, userPositions[myName.textContent], userPositions[name]);
                                 adjustVolume(mediaElement, userPositions[myName.textContent], userPositions[name]);
                             }
                         }
@@ -229,7 +226,6 @@ async function SkyWay_main(token) {
         };
     
         room.onStreamPublished.add((e) => {
-            console.log('New publication:', e.publication);
             subscribeAndAttach(e.publication);
         });
         me.onPublicationUnsubscribed.add(() => {
@@ -281,7 +277,4 @@ function adjustVolume(mediaElement, pos1, pos2) {
         mediaElement.volume = volume;
         mediaElement.muted = false;
     }
-    console.log(`now volume: ${volume}`);
-    console.log(`Media element volume set to: ${mediaElement.volume}`);
-    console.log(`Volume adjusted for ${mediaElement.getAttribute('data-username')}: ${mediaElement.volume}`);
 }
