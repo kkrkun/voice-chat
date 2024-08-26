@@ -102,6 +102,7 @@ async function SkyWay_main(token) {
     const target = document.getElementById('MuteInfo');
     const NonMutebtn = document.getElementById('NonMute-btn');
     const leavebtn = document.getElementById('leave');
+    const participantList = document.getElementById('participant-list');
 
     let isMuted = true;
 
@@ -113,43 +114,43 @@ async function SkyWay_main(token) {
             alert('名前を入力してください');
             return;
         }
-    
+
         // まずWebSocket接続を確立する
         const socket = await establishWebSocketConnection();
-    
+
         const audio = await SkyWayStreamFactory.createMicrophoneAudioStream();
-    
+
         if (roomNameInput === '') return;
-    
+
         const context = await SkyWayContext.Create(token);
         const room = await SkyWayRoom.FindOrCreate(context, {
             type: 'p2p',
             name: roomNameInput,
         });
         const me = await room.join({ name: userName });
-    
+
         const publication = await me.publish(audio);
-    
+
         console.log(`${userName} is connected`);
-    
+
         target.textContent = "ミュート解除中";
         NonMutebtn.style.backgroundColor = "rgb(147, 235, 235)";
-    
+
         myId.textContent = me.id;
         myName.textContent = userName;
         Memberselem.textContent = Members + "人";
         IdDisp.style.visibility = "visible";
-    
+
         NonMutebtn.style.visibility = "visible";
         NonMutebtn.style.opacity = 1;
         joinButton.style.visibility = "hidden";
         leavebtn.style.visibility = "visible";
-    
+
         leavebtn.onclick = () => {
             me.leave();
             location.reload();
         };
-    
+
         NonMutebtn.addEventListener('click', async () => {
             isMuted = !isMuted;
             if (isMuted) {
@@ -162,23 +163,32 @@ async function SkyWay_main(token) {
                 await publication.enable();
             }
         });
-    
+
+        const updateParticipantList = () => {
+            participantList.innerHTML = '';
+            room.members.forEach(member => {
+                const listItem = document.createElement('li');
+                listItem.textContent = member.name || member.id;
+                participantList.appendChild(listItem);
+            });
+        };
+
         const subscribeAndAttach = async (publication) => {
             if (publication.publisher.id === me.id) return;
-    
+
             const subscribeButton = document.createElement('button');
             subscribeButton.textContent = `${publication.publisher.name || publication.publisher.id}: ${publication.contentType}`;
             buttonArea.appendChild(subscribeButton);
-    
+
             subscribeButton.onclick = async () => {
                 try {
                     const { stream } = await me.subscribe(publication.id);
-    
+
                     const oldMediaElement = remoteMediaArea.querySelector(`[data-username="${publication.publisher.name || publication.publisher.id}"]`);
                     if (oldMediaElement) {
                         remoteMediaArea.removeChild(oldMediaElement);
                     }
-    
+
                     let newMedia;
                     switch (stream.track.kind) {
                         case 'audio':
@@ -193,7 +203,7 @@ async function SkyWay_main(token) {
                     }
                     stream.attach(newMedia);
                     remoteMediaArea.appendChild(newMedia);
-    
+
                     // WebSocket接続の処理
                     socket.addEventListener('message', (event) => {
                         const data = JSON.parse(event.data);
@@ -207,36 +217,42 @@ async function SkyWay_main(token) {
                             } else {
                                 userPositions[name] = position;
                             }
-    
+
                             const mediaElement = document.querySelector(`[data-username="${name}"]`);
                             if (name != myName.textContent && mediaElement && userPositions[myName.textContent] && userPositions[name] && position && Object.keys(position).length >= 1) {
                                 adjustVolume(mediaElement, userPositions[myName.textContent], userPositions[name]);
                             }
                         }
                     });
-    
+
                 } catch (error) {
                     console.error('Failed to subscribe to publication:', error);
                 }
             };
-    
+
             subscribeButton.click();
             Members++;
             Memberselem.textContent = Members + "人";
+            updateParticipantList();
         };
-    
+
         room.onStreamPublished.add((e) => {
+            console.log('New publication:', e.publication);
             subscribeAndAttach(e.publication);
         });
+
         me.onPublicationUnsubscribed.add(() => {
             Members--;
             Memberselem.textContent = Members + "人";
+            updateParticipantList();
         });
-    
+
         room.publications.forEach(publication => {
             subscribeAndAttach(publication);
         });
-    
+
+        updateParticipantList(); // 初期参加者リストの更新
+
         await publication.enable();
     };    
 }
@@ -278,3 +294,5 @@ function adjustVolume(mediaElement, pos1, pos2) {
         mediaElement.muted = false;
     }
 }
+
+
