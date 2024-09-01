@@ -4,6 +4,18 @@ body {
   padding: 0px;
 }
 
+#participant-list {
+  margin: 0 auto; /* リスト全体を中央に配置 */
+  list-style-type: disc; /* リストマーカーを点に設定 */
+  padding: 0;
+  width: fit-content; /* コンテンツに応じてリストの幅を調整 */
+}
+
+#participant-list li {
+  text-align: left; /* リスト項目のテキストを左寄せ */
+  padding-left: 20px; /* 点と文字の間に余白を追加 */
+}
+
 .header-text {
   margin: 0px;
   padding: 0px;
