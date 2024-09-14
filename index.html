@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <title>MCBEVC</title>
 </head>
+
 <body>
-    <header><h1 class="header-text">MCBEVC</h1></header>
+    <header>
+        <h1 class="header-text">MCBEVC</h1>
+    </header>
     <p id="id-disp">ID: <span id="my-id"></span></p>
     <p id="name-disp">ゲーマータグ: <span id="my-name"></span></p>
     <p id="Menber-disp">参加人数: <span id="Members">不明</span></p>
@@ -21,7 +27,15 @@
     <p><button id="leave" class="leave-btn">退出</button></p>
     <div id="button-area"></div>
     <div id="remote-media-area"></div>
+    <!-- 参加者リストのHTML要素 -->
+    <div>
+        <h2>参加者リスト</h2>
+        <ul id="participant-list"></ul>
+    </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.js"></script>
     <script src="main.js"></script>
 </body>
+
 </html>
