@@ -1,5 +1,4 @@
 const { nowInSec, SkyWayAuthToken, SkyWayContext, SkyWayRoom, SkyWayStreamFactory, uuidV4 } = skyway_room;
-console.log(window.env.APP_ID)
 window.onload = async function () {
     await SkyWay_main(String(Token));
 };
@@ -12,7 +11,7 @@ const Token = new SkyWayAuthToken({
     exp: nowInSec() + 60 * 60 * 24 * 3,
     scope: {
         app: {
-            id: window.env.APP_ID,
+            id: data.app_id,
             turn: true,
             actions: ['read'],
             channels: [
@@ -47,7 +46,7 @@ const Token = new SkyWayAuthToken({
             ],
         },
     },
-}).encode(window.env.SECRET_ID);
+}).encode(data.secret_id);
 
 async function establishWebSocketConnection() {
     const url = 'wss://kkryade1212.tcpexposer.com';
