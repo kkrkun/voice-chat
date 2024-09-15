@@ -20,10 +20,6 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
-
-env: 
-  APP_ID : ${{ secrets.APP_ID }}
-  SECRET_ID : ${{ secrets.SECRET_ID }}
           
 jobs:
   # Single deploy job since we're just deploying
@@ -42,6 +38,9 @@ jobs:
         with:
           # Upload entire repository
           path: '.'
+        env: 
+          APP_ID : ${{ secrets.APP_ID }}
+          SECRET_ID : ${{ secrets.SECRET_ID }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
