@@ -20,7 +20,11 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
-  
+
+env: 
+  APP_ID : ${{ secrets.APP_ID }}
+  SECRET_ID : ${{ secrets.SECRET_ID }}
+          
 jobs:
   # Single deploy job since we're just deploying
   deploy:
@@ -35,9 +39,6 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        env: 
-          APP_ID : ${{ secrets.APP_ID }}
-          SECRET_ID : ${{ secrets.SECRET_ID }}
         with:
           # Upload entire repository
           path: '.'
