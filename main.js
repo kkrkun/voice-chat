@@ -1,52 +1,277 @@
 const { nowInSec, SkyWayAuthToken, SkyWayContext, SkyWayRoom, SkyWayStreamFactory, uuidV4 } = skyway_room;
-window.onload = async function () {
-    await SkyWay_main(String(Token));
-};
 
-let serverDistance = 7; // デフォルトの distance
+async function fetchSkyWayCredentials() {
+    const url = 'wss://kkryade1212.tcpexposer.com'; // サーバーのWebSocket URL
+    let socket;
 
-const Token = new SkyWayAuthToken({
-    jti: uuidV4(),
-    iat: nowInSec(),
-    exp: nowInSec() + 60 * 60 * 24 * 3,
-    scope: {
-        app: {
-            id: data.app_id,
-            turn: true,
-            actions: ['read'],
-            channels: [
-                {
-                    id: '*',
-                    name: '*',
-                    actions: ['write'],
-                    members: [
+    const connect = () => {
+        return new Promise((resolve, reject) => {
+            socket = new WebSocket(url);
+
+            socket.addEventListener('open', () => {
+                console.log('WebSocket connection established');
+                resolve(socket);
+            });
+
+            socket.addEventListener('error', (error) => {
+                console.error('WebSocket error:', error);
+                reject(error);
+            });
+
+            socket.addEventListener('message', (event) => {
+                const data = JSON.parse(event.data);
+                if (data.app_id && data.secret_id) {
+                    resolve(data); // app_idとsecret_idを受け取る
+                } else {
+                    reject(new Error('app_id or secret_id is missing'));
+                }
+            });
+
+            socket.addEventListener('close', () => {
+                console.log('WebSocket connection closed');
+            });
+        });
+    };
+
+    try {
+        socket = await connect();
+        socket.send(JSON.stringify({ action: 'get_skyway_credentials' })); // サーバーにリクエストを送信
+
+        const credentials = await new Promise((resolve, reject) => {
+            socket.addEventListener('message', (event) => {
+                const data = JSON.parse(event.data);
+                if (data.app_id && data.secret_id) {
+                    resolve(data); // サーバーからのレスポンスで必要な情報を取得
+                } else {
+                    reject(new Error('Failed to fetch credentials'));
+                }
+            });
+        });
+
+        return credentials;
+    } catch (error) {
+        console.error('Failed to fetch SkyWay credentials:', error);
+        throw error; // エラー処理を適切に行う
+    }
+}
+
+async function SkyWay_main() {
+    try {
+        // WebSocketを通じてSkyWayの`app_id`と`secret_id`を取得
+        const credentials = await fetchSkyWayCredentials();
+        const { app_id, secret_id } = credentials;
+
+        // SkyWayトークンの生成
+        const token = new SkyWayAuthToken({
+            jti: uuidV4(),
+            iat: nowInSec(),
+            exp: nowInSec() + 60 * 60 * 24 * 3, // 有効期限3日
+            scope: {
+                app: {
+                    id: app_id, // 取得したapp_idを使用
+                    turn: true,
+                    actions: ['read'],
+                    channels: [
                         {
                             id: '*',
                             name: '*',
                             actions: ['write'],
-                            publication: {
-                                actions: ['write'],
-                            },
-                            subscription: {
-                                actions: ['write'],
-                            },
-                        },
-                    ],
-                    sfuBots: [
-                        {
-                            actions: ['write'],
-                            forwardings: [
+                            members: [
+                                {
+                                    id: '*',
+                                    name: '*',
+                                    actions: ['write'],
+                                    publication: {
+                                        actions: ['write'],
+                                    },
+                                    subscription: {
+                                        actions: ['write'],
+                                    },
+                                },
+                            ],
+                            sfuBots: [
                                 {
                                     actions: ['write'],
+                                    forwardings: [
+                                        {
+                                            actions: ['write'],
+                                        },
+                                    ],
                                 },
                             ],
                         },
                     ],
                 },
-            ],
-        },
-    },
-}).encode(data.secret_id);
+            },
+        }).encode(secret_id); // 取得したsecret_idを使用
+
+        // SkyWayのコンテキストを作成して、SkyWayの接続を開始
+        const context = await SkyWayContext.Create(token);
+        const roomNameInput = "transceiver";
+        const room = await SkyWayRoom.FindOrCreate(context, {
+            type: 'p2p',
+            name: roomNameInput,
+        });
+
+        const joinButton = document.getElementById('join');
+        const userNameInput = document.getElementById('user-name');
+        const participantList = document.getElementById('participant-list');
+        const myId = document.getElementById('my-id');
+        const myName = document.getElementById('my-name');
+        const Memberselem = document.getElementById('Members');
+        const IdDisp = document.getElementById('id-disp');
+        const target = document.getElementById('MuteInfo');
+        const NonMutebtn = document.getElementById('NonMute-btn');
+        const leavebtn = document.getElementById('leave');
+        const buttonArea = document.getElementById('button-area');
+        const remoteMediaArea = document.getElementById('remote-media-area');
+
+        let Members = 1;
+        let isMuted = true;
+        const userPositions = {};
+
+        joinButton.onclick = async () => {
+            const userName = userNameInput.value.trim();
+            if (userName === '') {
+                alert('名前を入力してください');
+                return;
+            }
+
+            // マイク音声ストリームを作成
+            const audio = await SkyWayStreamFactory.createMicrophoneAudioStream();
+            const me = await room.join({ name: userName });
+            const publication = await me.publish(audio);
+
+            console.log(`${userName} is connected`);
+
+            target.textContent = "ミュート解除中";
+            NonMutebtn.style.backgroundColor = "rgb(147, 235, 235)";
+
+            myId.textContent = me.id;
+            myName.textContent = userName;
+            Memberselem.textContent = Members + "人";
+            IdDisp.style.visibility = "visible";
+            NonMutebtn.style.visibility = "visible";
+            NonMutebtn.style.opacity = 1;
+            joinButton.style.visibility = "hidden";
+            leavebtn.style.visibility = "visible";
+
+            leavebtn.onclick = () => {
+                me.leave();
+                location.reload();
+            };
+
+            NonMutebtn.addEventListener('click', async () => {
+                isMuted = !isMuted;
+                if (isMuted) {
+                    target.textContent = "ミュート中";
+                    NonMutebtn.style.backgroundColor = "red";
+                    await publication.disable();
+                } else {
+                    target.textContent = "ミュート解除中";
+                    NonMutebtn.style.backgroundColor = "rgb(147, 235, 235)";
+                    await publication.enable();
+                }
+            });
+
+            const updateParticipantList = () => {
+                participantList.innerHTML = '';
+                room.members.forEach(member => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = member.name || member.id;
+                    participantList.appendChild(listItem);
+                });
+            };
+
+            const subscribeAndAttach = async (publication) => {
+                if (publication.publisher.id === me.id) return;
+
+                const subscribeButton = document.createElement('button');
+                subscribeButton.textContent = `${publication.publisher.name || publication.publisher.id}: ${publication.contentType}`;
+                buttonArea.appendChild(subscribeButton);
+
+                subscribeButton.onclick = async () => {
+                    try {
+                        const { stream } = await me.subscribe(publication.id);
+
+                        const oldMediaElement = remoteMediaArea.querySelector(`[data-username="${publication.publisher.name || publication.publisher.id}"]`);
+                        if (oldMediaElement) {
+                            remoteMediaArea.removeChild(oldMediaElement);
+                        }
+
+                        let newMedia;
+                        switch (stream.track.kind) {
+                            case 'audio':
+                                newMedia = document.createElement('audio');
+                                newMedia.controls = true;
+                                newMedia.autoplay = true;
+                                newMedia.setAttribute('data-username', publication.publisher.name || publication.publisher.id);
+                                newMedia.volume = 0;
+                                break;
+                            default:
+                                return;
+                        }
+                        stream.attach(newMedia);
+                        remoteMediaArea.appendChild(newMedia);
+
+                        // WebSocket接続の処理
+                        const socket = await establishWebSocketConnection();
+                        socket.addEventListener('message', (event) => {
+                            const data = JSON.parse(event.data);
+                            console.log(data);
+                            const positions = data.positions;
+                            serverDistance = data.distance; // サーバーから受け取った distance を使用
+                            for (const [name, position] of Object.entries(positions)) {
+                                if (!userPositions[name]) {
+                                    userPositions[name] = { x: 0, y: 10000, z: 0 };
+                                } else if (!position || Object.keys(position).length === 0) {
+                                    userPositions[name] = { x: 0, y: 10000, z: 0 };
+                                } else {
+                                    userPositions[name] = position;
+                                }
+
+                                const mediaElement = document.querySelector(`[data-username="${name}"]`);
+                                if (name !== myName.textContent && mediaElement && userPositions[myName.textContent] && userPositions[name] && position && Object.keys(position).length >= 1) {
+                                    adjustVolume(mediaElement, userPositions[myName.textContent], userPositions[name]);
+                                }
+                            }
+                        });
+
+                    } catch (error) {
+                        console.error('Failed to subscribe to publication:', error);
+                    }
+                };
+
+                subscribeButton.click();
+                Members++;
+                Memberselem.textContent = Members + "人";
+                updateParticipantList();
+            };
+
+            room.onStreamPublished.add((e) => {
+                console.log('New publication:', e.publication);
+                subscribeAndAttach(e.publication);
+            });
+
+            me.onPublicationUnsubscribed.add(() => {
+                Members--;
+                Memberselem.textContent = Members + "人";
+                updateParticipantList();
+            });
+
+            room.publications.forEach(publication => {
+                subscribeAndAttach(publication);
+            });
+
+            updateParticipantList(); // 初期参加者リストの更新
+
+            await publication.enable();
+        };
+
+    } catch (error) {
+        console.error('Error in SkyWay_main:', error);
+    }
+}
 
 async function establishWebSocketConnection() {
     const url = 'wss://kkryade1212.tcpexposer.com';
@@ -68,7 +293,6 @@ async function establishWebSocketConnection() {
 
             socket.addEventListener('close', () => {
                 console.log('WebSocket connection closed');
-                // 再接続しないため、ここでの再接続ロジックを削除
             });
         });
     };
@@ -81,190 +305,6 @@ async function establishWebSocketConnection() {
         throw error; // 必要に応じてエラー処理
     }
 }
-
-
-async function SkyWay_main(token) {
-    const { SkyWayContext, SkyWayRoom, SkyWayStreamFactory } = skyway_room;
-
-    const buttonArea = document.getElementById('button-area');
-    const remoteMediaArea = document.getElementById('remote-media-area');
-    const roomNameInput = "transceiver";
-
-    let Members = 1;
-
-    const myId = document.getElementById('my-id');
-    const myName = document.getElementById('my-name');
-    const Memberselem = document.getElementById('Members');
-    const IdDisp = document.getElementById('id-disp');
-    const joinButton = document.getElementById('join');
-    const userNameInput = document.getElementById('user-name');
-    const target = document.getElementById('MuteInfo');
-    const NonMutebtn = document.getElementById('NonMute-btn');
-    const leavebtn = document.getElementById('leave');
-    const participantList = document.getElementById('participant-list');
-
-    let isMuted = true;
-
-    const userPositions = {};
-
-    joinButton.onclick = async () => {
-        const userName = userNameInput.value.trim();
-        if (userName === '') {
-            alert('名前を入力してください');
-            return;
-        }
-
-        // まずWebSocket接続を確立する
-        const socket = await establishWebSocketConnection();
-
-        const audio = await SkyWayStreamFactory.createMicrophoneAudioStream();
-
-        if (roomNameInput === '') return;
-
-        const context = await SkyWayContext.Create(token);
-        const room = await SkyWayRoom.FindOrCreate(context, {
-            type: 'p2p',
-            name: roomNameInput,
-        });
-        const me = await room.join({ name: userName });
-
-        const publication = await me.publish(audio);
-
-        console.log(`${userName} is connected`);
-
-        target.textContent = "ミュート解除中";
-        NonMutebtn.style.backgroundColor = "rgb(147, 235, 235)";
-
-        myId.textContent = me.id;
-        myName.textContent = userName;
-        Memberselem.textContent = Members + "人";
-        IdDisp.style.visibility = "visible";
-
-        NonMutebtn.style.visibility = "visible";
-        NonMutebtn.style.opacity = 1;
-        joinButton.style.visibility = "hidden";
-        leavebtn.style.visibility = "visible";
-
-        leavebtn.onclick = () => {
-            me.leave();
-            location.reload();
-        };
-
-        NonMutebtn.addEventListener('click', async () => {
-            isMuted = !isMuted;
-            if (isMuted) {
-                target.textContent = "ミュート中";
-                NonMutebtn.style.backgroundColor = "red";
-                await publication.disable();
-            } else {
-                target.textContent = "ミュート解除中";
-                NonMutebtn.style.backgroundColor = "rgb(147, 235, 235)";
-                await publication.enable();
-            }
-        });
-
-        const updateParticipantList = () => {
-            participantList.innerHTML = '';
-            room.members.forEach(member => {
-                const listItem = document.createElement('li');
-                listItem.textContent = member.name || member.id;
-                participantList.appendChild(listItem);
-            });
-        };
-
-        const subscribeAndAttach = async (publication) => {
-            if (publication.publisher.id === me.id) return;
-
-            const subscribeButton = document.createElement('button');
-            subscribeButton.textContent = `${publication.publisher.name || publication.publisher.id}: ${publication.contentType}`;
-            buttonArea.appendChild(subscribeButton);
-
-            subscribeButton.onclick = async () => {
-                try {
-                    const { stream } = await me.subscribe(publication.id);
-
-                    const oldMediaElement = remoteMediaArea.querySelector(`[data-username="${publication.publisher.name || publication.publisher.id}"]`);
-                    if (oldMediaElement) {
-                        remoteMediaArea.removeChild(oldMediaElement);
-                    }
-
-                    let newMedia;
-                    switch (stream.track.kind) {
-                        case 'audio':
-                            newMedia = document.createElement('audio');
-                            newMedia.controls = true;
-                            newMedia.autoplay = true;
-                            newMedia.setAttribute('data-username', publication.publisher.name || publication.publisher.id);
-                            newMedia.volume = 0;
-                            break;
-                        default:
-                            return;
-                    }
-                    stream.attach(newMedia);
-                    remoteMediaArea.appendChild(newMedia);
-
-                    // WebSocket接続の処理
-                    socket.addEventListener('message', (event) => {
-                        const data = JSON.parse(event.data);
-                        console.log(data);
-                        const positions = data.positions;
-                        serverDistance = data.distance; // サーバーから受け取った distance を使用
-                        for (const [name, position] of Object.entries(positions)) {
-                            if (!userPositions[name]) {
-                                userPositions[name] = { x: 0, y: 10000, z: 0 };
-                            } else if (!position || Object.keys(position).length === 0) {
-                                userPositions[name] = { x: 0, y: 10000, z: 0 };
-                            } else {
-                                userPositions[name] = position;
-                            }
-
-                            const mediaElement = document.querySelector(`[data-username="${name}"]`);
-                            if (name != myName.textContent && mediaElement && userPositions[myName.textContent] && userPositions[name] && position && Object.keys(position).length >= 1) {
-                                adjustVolume(mediaElement, userPositions[myName.textContent], userPositions[name]);
-                            }
-                        }
-                    });
-
-                } catch (error) {
-                    console.error('Failed to subscribe to publication:', error);
-                }
-            };
-
-            subscribeButton.click();
-            Members++;
-            Memberselem.textContent = Members + "人";
-            updateParticipantList();
-        };
-
-        room.onStreamPublished.add((e) => {
-            console.log('New publication:', e.publication);
-            subscribeAndAttach(e.publication);
-        });
-
-        me.onPublicationUnsubscribed.add(() => {
-            Members--;
-            Memberselem.textContent = Members + "人";
-            updateParticipantList();
-        });
-
-        room.publications.forEach(publication => {
-            subscribeAndAttach(publication);
-        });
-
-        updateParticipantList(); // 初期参加者リストの更新
-
-        await publication.enable();
-    };    
-}
-
-navigator.permissions.query({ name: 'microphone' }).then((result) => {
-    if (result.state === 'granted') {
-        console.log("マイクを利用します");
-    } else {
-        console.log("マイクの権限取得エラーです");
-        alert("マイクを使用する権限を与えて下さい");
-    }
-});
 
 function calculateDistance(pos1, pos2) {
     return Math.sqrt(
@@ -295,4 +335,15 @@ function adjustVolume(mediaElement, pos1, pos2) {
     }
 }
 
+navigator.permissions.query({ name: 'microphone' }).then((result) => {
+    if (result.state === 'granted') {
+        console.log("マイクを利用します");
+    } else {
+        console.log("マイクの権限取得エラーです");
+        alert("マイクを使用する権限を与えて下さい");
+    }
+});
 
+window.onload = async function () {
+    await SkyWay_main(); // トークン取得後にSkyWay_mainを実行
+};
