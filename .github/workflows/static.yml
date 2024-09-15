@@ -35,10 +35,11 @@ jobs:
         uses: actions/configure-pages@v5
       - run: npm ci
       - run: npm run build
-        env: APP_ID : ${{ secrets.APP_ID }}
-        env: SECRET_ID : ${{ secrets.SECRET_ID }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        env: 
+          APP_ID : ${{ secrets.APP_ID }}
+          SECRET_ID : ${{ secrets.SECRET_ID }}
         with:
           # Upload entire repository
           path: "dist"
