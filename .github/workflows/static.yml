@@ -31,9 +31,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
         
+      # 新しいステップ: publicディレクトリの作成
+      - name: Create public directory
+        run: mkdir -p public
+        
+      # 環境変数をJSファイルに埋め込む
       - name: Inject environment variables into JS
-        run: |
-          echo "window.env = { APP_ID: '${{ secrets.APP_ID }}', SECRET_ID: '${{ secrets.SECRET_ID }}' };" > public/env.js
+        run: echo "window.env = { APP_ID: '${{ secrets.APP_ID }}', SECRET_ID: '${{ secrets.SECRET_ID }}' };" > public/env.js
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -43,4 +47,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
