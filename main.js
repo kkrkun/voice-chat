@@ -61,7 +61,7 @@ async function establishWebSocketConnection() {
     }
 }
 
-async function SkyWay_main(token) {
+async function SkyWay_main(token, userName) {
     const { SkyWayContext, SkyWayRoom, SkyWayStreamFactory } = skyway_room;
 
     const buttonArea = document.getElementById('button-area');
@@ -85,94 +85,26 @@ async function SkyWay_main(token) {
 
     const userPositions = {};
 
-    joinButton.onclick = async () => {
-        const userName = userNameInput.value.trim();
-        if (userName === '') {
-            alert('名前を入力してください');
-            return;
-        }
-
-        try {
-            // WebSocketでapp_idとsecret_idを取得
-            const { app_id, secret_id } = await fetchAppIdAndSecretId();
-
-            // Tokenの作成
-            const Token = new SkyWayAuthToken({
-                jti: uuidV4(),
-                iat: nowInSec(),
-                exp: nowInSec() + 60 * 60 * 24 * 3,
-                scope: {
-                    app: {
-                        id: app_id,
-                        turn: true,
-                        actions: ['read'],
-                        channels: [
-                            {
-                                id: '*',
-                                name: '*',
-                                actions: ['write'],
-                                members: [
-                                    {
-                                        id: '*',
-                                        name: '*',
-                                        actions: ['write'],
-                                        publication: {
-                                            actions: ['write'],
-                                        },
-                                        subscription: {
-                                            actions: ['write'],
-                                        },
-                                    },
-                                ],
-                                sfuBots: [
-                                    {
-                                        actions: ['write'],
-                                        forwardings: [
-                                            {
-                                                actions: ['write'],
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                },
-            }).encode(secret_id);
-
-            // SkyWay_mainを呼び出して、Tokenを渡す
-            await SkyWay_main(Token);
-
-        } catch (error) {
-            console.error('Error occurred during the join process:', error);
-        }
-    };
-
-    // WebSocket接続を確立する
     const socket = await establishWebSocketConnection();
-
-    // 音声ストリームの作成
     const audio = await SkyWayStreamFactory.createMicrophoneAudioStream();
 
     if (roomNameInput === '') return;
 
-    // SkyWayContextとRoomの作成
     const context = await SkyWayContext.Create(token);
     const room = await SkyWayRoom.FindOrCreate(context, {
         type: 'p2p',
         name: roomNameInput,
     });
-    const me = await room.join({ name: userNameInput.value.trim() });
+    const me = await room.join({ name: userName });
 
     const publication = await me.publish(audio);
 
-    console.log(`${userNameInput.value.trim()} is connected`);
+    console.log(`${userName} is connected`);
 
-    // UIの更新
     target.textContent = "ミュート解除中";
     NonMutebtn.style.backgroundColor = "rgb(147, 235, 235)";
     myId.textContent = me.id;
-    myName.textContent = userNameInput.value.trim();
+    myName.textContent = userName;
     Memberselem.textContent = Members + "人";
     IdDisp.style.visibility = "visible";
 
@@ -239,12 +171,11 @@ async function SkyWay_main(token) {
                 stream.attach(newMedia);
                 remoteMediaArea.appendChild(newMedia);
 
-                // WebSocket接続の処理
                 socket.addEventListener('message', (event) => {
                     const data = JSON.parse(event.data);
                     console.log(data);
                     const positions = data.positions;
-                    serverDistance = data.distance; // サーバーから受け取った distance を使用
+                    serverDistance = data.distance;
                     for (const [name, position] of Object.entries(positions)) {
                         if (!userPositions[name]) {
                             userPositions[name] = { x: 0, y: 10000, z: 0 };
@@ -255,7 +186,7 @@ async function SkyWay_main(token) {
                         }
 
                         const mediaElement = document.querySelector(`[data-username="${name}"]`);
-                        if (name != myName.textContent && mediaElement && userPositions[myName.textContent] && userPositions[name] && position && Object.keys(position).length >= 1) {
+                        if (name !== myName.textContent && mediaElement && userPositions[myName.textContent] && userPositions[name] && position && Object.keys(position).length >= 1) {
                             adjustVolume(mediaElement, userPositions[myName.textContent], userPositions[name]);
                         }
                     }
@@ -292,14 +223,79 @@ async function SkyWay_main(token) {
     await publication.enable();
 }
 
-navigator.permissions.query({ name: 'microphone' }).then((result) => {
-    if (result.state === 'granted') {
-        console.log("マイクを利用します");
-    } else {
-        console.log("マイクの権限取得エラーです");
-        alert("マイクを使用する権限を与えて下さい");
-    }
-});
+// ページ読み込み時にボタンイベントハンドラを設定
+window.onload = async function () {
+    const joinButton = document.getElementById('join');
+    joinButton.onclick = async () => {
+        const userName = document.getElementById('user-name').value.trim();
+        if (userName === '') {
+            alert('名前を入力してください');
+            return;
+        }
+
+        try {
+            // WebSocketでapp_idとsecret_idを取得
+            const { app_id, secret_id } = await fetchAppIdAndSecretId();
+
+            // Tokenの作成
+            const Token = new SkyWayAuthToken({
+                jti: uuidV4(),
+                iat: nowInSec(),
+                exp: nowInSec() + 60 * 60 * 24 * 3,
+                scope: {
+                    app: {
+                        id: app_id,
+                        turn: true,
+                        actions: ['read'],
+                        channels: [
+                            {
+                                id: '*',
+                                name: '*',
+                                actions: ['write'],
+                                members: [
+                                    {
+                                        id: '*',
+                                        name: '*',
+                                        actions: ['write'],
+                                        publication: {
+                                            actions: ['write'],
+                                        },
+                                        subscription: {
+                                            actions: ['write'],
+                                        },
+                                    },
+                                ],
+                                sfuBots: [
+                                    {
+                                        actions: ['write'],
+                                        forwardings: [
+                                            {
+                                                actions: ['write'],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                },
+            }).encode(secret_id);
+
+            await SkyWay_main(Token, userName);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    navigator.permissions.query({ name: 'microphone' }).then((result) => {
+        if (result.state === 'granted') {
+            console.log("マイクを利用します");
+        } else {
+            console.log("マイクの権限取得エラーです");
+            alert("マイクを使用する権限を与えて下さい");
+        }
+    });
+}
 
 function calculateDistance(pos1, pos2) {
     return Math.sqrt(
