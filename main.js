@@ -173,7 +173,6 @@ async function SkyWay_main(token, userName) {
 
                 socket.addEventListener('message', (event) => {
                     const data = JSON.parse(event.data);
-                    console.log(data);
                     const positions = data.positions;
                     serverDistance = data.distance;
                     for (const [name, position] of Object.entries(positions)) {
