@@ -12,7 +12,7 @@ const Token = new SkyWayAuthToken({
     exp: nowInSec() + 60 * 60 * 24 * 3,
     scope: {
         app: {
-            id: "7dc26499-2433-43ec-8285-99beff41a46b",
+            id: APP_ID,
             turn: true,
             actions: ['read'],
             channels: [
@@ -47,7 +47,7 @@ const Token = new SkyWayAuthToken({
             ],
         },
     },
-}).encode("ektEwMWo27esBj8OPysenv96493Rh9Ze0wOAVa3ott4=");
+}).encode(SECRET_ID);
 
 async function establishWebSocketConnection() {
     const url = 'wss://kkryade1212.tcpexposer.com';
