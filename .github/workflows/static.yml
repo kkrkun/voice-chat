@@ -40,7 +40,7 @@ jobs:
           SECRET_ID : ${{ secrets.SECRET_ID }}
         with:
           # Upload entire repository
-          path: "dist"
+          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
