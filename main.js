@@ -1,6 +1,5 @@
 const { nowInSec, SkyWayAuthToken, SkyWayContext, SkyWayRoom, SkyWayStreamFactory, uuidV4 } = skyway_room;
 console.log(process.env.APP_ID)
-console.log(APP_ID)
 window.onload = async function () {
     await SkyWay_main(String(Token));
 };
