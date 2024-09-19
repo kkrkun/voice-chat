@@ -11,8 +11,8 @@ async function fetchAppIdAndSecretId() {
 
         socket.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
-            if (data.app_id && data.secret_id) {
-                resolve({ app_id: data.app_id, secret_id: data.secret_id });
+            if (data.app_id && data.secret_key) {
+                resolve({ app_id: data.app_id, secret_key: data.secret_key });
                 socket.close();
             }
         });
@@ -234,7 +234,7 @@ window.onload = async function () {
 
         try {
             // WebSocketでapp_idとsecret_idを取得
-            const { app_id, secret_id } = await fetchAppIdAndSecretId();
+            const { app_id, secret_key } = await fetchAppIdAndSecretId();
 
             // Tokenの作成
             const Token = new SkyWayAuthToken({
@@ -278,7 +278,7 @@ window.onload = async function () {
                         ],
                     },
                 },
-            }).encode(secret_id);
+            }).encode(secret_key);
 
             await SkyWay_main(Token, userName);
         } catch (error) {
