@@ -207,7 +207,8 @@ async function SkyWay_main(token, userName) {
         subscribeAndAttach(e.publication);
     });
 
-    me.onPublicationUnsubscribed.add(() => {
+    room.onMemberLeft.add((e) => {
+        console.log('Member left:', e.member);
         Members--;
         Memberselem.textContent = Members + "人";
         updateParticipantList();
