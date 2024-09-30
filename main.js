@@ -86,7 +86,13 @@ async function SkyWay_main(token, userName) {
     const userPositions = {};
 
     const socket = await establishWebSocketConnection();
-    const audio = await SkyWayStreamFactory.createMicrophoneAudioStream();
+    const audio = await SkyWayStreamFactory.createMicrophoneAudioStream({
+    audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+    }
+});
 
     if (roomNameInput === '') return;
 
