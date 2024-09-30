@@ -203,12 +203,10 @@ async function SkyWay_main(token, userName) {
     };
 
     room.onStreamPublished.add((e) => {
-        console.log('New publication:', e.publication);
         subscribeAndAttach(e.publication);
     });
 
     room.onMemberLeft.add((e) => {
-        console.log('Member left:', e.member);
         Members--;
         Memberselem.textContent = Members + "人";
         updateParticipantList();
