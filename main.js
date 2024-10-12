@@ -65,27 +65,6 @@ async function establishWebSocketConnection() {
     }
 }
 
-// TensorFlow.js のモデルを読み込み、音声処理を適用
-async function applyNoiseSuppression(audioTrack) {
-    // TensorFlow.js ノイズ抑制モデルの読み込み
-    const model = await tf.loadGraphModel('./noise_model_name.json');
-
-    // 音声ストリームを処理するためのオーディオコンテキストを作成
-    const audioContext = new AudioContext();
-    const source = audioContext.createMediaStreamSource(new MediaStream([audioTrack]));
-
-    // TensorFlow.js に渡すために、ストリームデータを取得し、処理を行う
-    // オーディオデータをモデルに入力してノイズ抑制を適用
-    const processedAudio = model.executeAsync(source);
-
-    // 処理した音声ストリームを SkyWay に再公開
-    const processedAudioTrack = processedAudio.getAudioTracks()[0];
-    const processedAudioStream = new MediaStream([processedAudioTrack]);
-
-    // ノイズ抑制後の音声を SkyWay に公開
-    await me.publish(processedAudioStream);
-}
-
 async function SkyWay_main(token, userName) {
     const { SkyWayContext, SkyWayRoom, SkyWayStreamFactory } = skyway_room;
 
@@ -111,7 +90,6 @@ async function SkyWay_main(token, userName) {
 
     // マイクストリームの取得
     let audio = null;
-    let audioTrack = null;
     try {
         audio = await SkyWayStreamFactory.createMicrophoneAudioStream({
             audio: {
@@ -120,8 +98,6 @@ async function SkyWay_main(token, userName) {
                 autoGainControl: true
             }
         });
-        // MediaStreamTrack を取得
-        audioTrack = audio.track;
     } catch (error) {
         console.warn('マイクの権限がないか、エラーが発生しました。ミュートで参加します。');
         if (lang === 'ja') {
@@ -144,7 +120,7 @@ async function SkyWay_main(token, userName) {
     // マイクストリームが取得できた場合のみ公開する
     let publication = null;
     if (audio) {
-        publication = await applyNoiseSuppression(audioTrack);;
+        publication = await me.publish(audio);
     }
 
     console.log(`${userName} is connected`);
