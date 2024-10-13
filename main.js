@@ -65,6 +65,61 @@ async function establishWebSocketConnection() {
     }
 }
 
+async function connectvc(userName) {
+    try {
+        // WebSocketでapp_idとsecret_idを取得
+        const { app_id, secret_key } = await fetchAppIdAndSecretId();
+
+        // Tokenの作成
+        const Token = new SkyWayAuthToken({
+            jti: uuidV4(),
+            iat: nowInSec(),
+            exp: nowInSec() + 60 * 60 * 24 * 3,
+            scope: {
+                app: {
+                    id: app_id,
+                    turn: true,
+                    actions: ['read'],
+                    channels: [
+                        {
+                            id: '*',
+                            name: '*',
+                            actions: ['write'],
+                            members: [
+                                {
+                                    id: '*',
+                                    name: '*',
+                                    actions: ['write'],
+                                    publication: {
+                                        actions: ['write'],
+                                    },
+                                    subscription: {
+                                        actions: ['write'],
+                                    },
+                                },
+                            ],
+                            sfuBots: [
+                                {
+                                    actions: ['write'],
+                                    forwardings: [
+                                        {
+                                            actions: ['write'],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+        }).encode(secret_key);
+
+        await SkyWay_main(Token, userName);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
 async function SkyWay_main(token, userName) {
     const { SkyWayContext, SkyWayRoom, SkyWayStreamFactory } = skyway_room;
 
@@ -171,16 +226,15 @@ async function SkyWay_main(token, userName) {
                             autoGainControl: true
                         }
                     });
-
+                    publication = null
                     // ストリームが取得できた場合、パブリッシュする
-                    if (publication) {
-                        await publication.replace(audio);
-                    } else {
+                    if (audio) {
                         publication = await me.publish(audio);
                     }
                     await publication.enable();
                 } catch (error) {
                     // 権限が付与され、マイクが有効になった場合にミュート解除
+                    console.log(error)
                     isMuted = true;
                     if (lang === 'ja') {
                         target.textContent = "ミュート中";
@@ -332,6 +386,7 @@ async function SkyWay_main(token, userName) {
 
     room.onStreamPublished.add((e) => {
         subscribeAndAttach(e.publication);
+        console.log(e.publication)
     });
 
     room.onMemberJoined.add((e) => {
@@ -367,74 +422,53 @@ window.onload = async function () {
             }
             return;
         }
-
-        try {
-            // WebSocketでapp_idとsecret_idを取得
-            const { app_id, secret_key } = await fetchAppIdAndSecretId();
-
-            // Tokenの作成
-            const Token = new SkyWayAuthToken({
-                jti: uuidV4(),
-                iat: nowInSec(),
-                exp: nowInSec() + 60 * 60 * 24 * 3,
-                scope: {
-                    app: {
-                        id: app_id,
-                        turn: true,
-                        actions: ['read'],
-                        channels: [
-                            {
-                                id: '*',
-                                name: '*',
-                                actions: ['write'],
-                                members: [
-                                    {
-                                        id: '*',
-                                        name: '*',
-                                        actions: ['write'],
-                                        publication: {
-                                            actions: ['write'],
-                                        },
-                                        subscription: {
-                                            actions: ['write'],
-                                        },
-                                    },
-                                ],
-                                sfuBots: [
-                                    {
-                                        actions: ['write'],
-                                        forwardings: [
-                                            {
-                                                actions: ['write'],
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                },
-            }).encode(secret_key);
-
-            await SkyWay_main(Token, userName);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
-    navigator.permissions.query({ name: 'microphone' }).then((result) => {
-        if (result.state === 'granted') {
-            console.log("マイクを利用します");
-        } else {
-            if (lang === 'ja') {
-                alert("マイクを使用する権限を与えて下さい");
+        const socket = new WebSocket(url);
+        let pass = true
+        socket.addEventListener('message', async (event) => {
+            const data = JSON.parse(event.data);
+            const password = data.password;
+            const passwords = data.passwords;
+            if (password) {
+                let userInput = "";
+                if (lang === 'ja') {
+                    userInput = prompt("パスワードを入力してください");
+                } else {
+                    userInput = prompt("Please enter password");
+                }
+                if (userInput == passwords[userName]) {
+                    socket.close();
+                    await connectvc(userName);
+                }
+                else {
+                    if (lang === 'ja') {
+                        alert("パスワードが違います");
+                    } else {
+                        alert("Incorrect password");
+                    }
+                    socket.close();
+                    return;
+                }
             } else {
-                alert("Please grant microphone permissions.");
+                socket.close();
+                await connectvc(userName);
             }
-            console.log("マイクの権限取得エラーです");
+        });
+    }
+};
+
+navigator.permissions.query({ name: 'microphone' }).then((result) => {
+    if (result.state === 'granted') {
+        console.log("マイクを利用します");
+    } else {
+        if (lang === 'ja') {
+            alert("マイクを使用する権限を与えて下さい");
+        } else {
+            alert("Please grant microphone permissions.");
         }
-    });
-}
+        console.log("マイクの権限取得エラーです");
+    }
+});
+
 
 function calculateDistance(pos1, pos2) {
     return Math.sqrt(
