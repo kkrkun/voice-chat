@@ -148,7 +148,7 @@ async function SkyWay_main(token, userName) {
     try {
         audio = await SkyWayStreamFactory.createMicrophoneAudioStream({
             audio: {
-                echoCancellation: true,
+                echoCancellation: false,
                 noiseSuppression: true,
                 autoGainControl: true
             }
