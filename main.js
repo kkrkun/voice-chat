@@ -221,7 +221,7 @@ async function SkyWay_main(token, userName) {
                     // マイクストリームの取得を試みる
                     const audio = await SkyWayStreamFactory.createMicrophoneAudioStream({
                         audio: {
-                            echoCancellation: true,
+                            echoCancellation: false,
                             noiseSuppression: true,
                             autoGainControl: true
                         }
