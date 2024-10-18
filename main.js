@@ -499,7 +499,7 @@ function adjustVolume(mediaElement, pos1, pos2, name) {
     const SliderVolume = sliderValue / 100;
     const distance = calculateDistance(pos1, pos2);
     const minVolume = 0;
-    const volume = Math.max(minVolume, 1 - (distance / serverDistance)); // serverDistance を使用
+    let volume = Math.max(minVolume, 1 - (distance / serverDistance)); // serverDistance を使用
     volume = volume * SliderVolume
     if (volume == 0) {
         mediaElement.volume = minVolume;
