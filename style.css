@@ -1,7 +1,18 @@
 body {
+  background-color: white; /* 背景色を白に設定 */
+  color: black; /* 文字色を黒に設定 */
+  font-family: Arial, sans-serif;
   text-align: center;
   margin: 0px;
   padding: 0px;
+}
+
+/* ダークモードのスタイル */
+@media (prefers-color-scheme: dark) {
+  body {
+      background-color: black; /* 背景色を黒に設定 */
+      color: white; /* 文字色を白に設定 */
+  }
 }
 
 #participant-list {
