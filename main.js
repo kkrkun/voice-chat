@@ -148,7 +148,7 @@ async function SkyWay_main(token, userName) {
     try {
         audio = await SkyWayStreamFactory.createMicrophoneAudioStream({
             audio: {
-                echoCancellation: false,
+                echoCancellation: true,
                 noiseSuppression: true,
                 autoGainControl: true
             }
@@ -221,7 +221,7 @@ async function SkyWay_main(token, userName) {
                     // マイクストリームの取得を試みる
                     const audio = await SkyWayStreamFactory.createMicrophoneAudioStream({
                         audio: {
-                            echoCancellation: false,
+                            echoCancellation: true,
                             noiseSuppression: true,
                             autoGainControl: true
                         }
@@ -386,7 +386,6 @@ async function SkyWay_main(token, userName) {
 
     room.onStreamPublished.add((e) => {
         subscribeAndAttach(e.publication);
-        console.log(e.publication)
     });
 
     room.onMemberJoined.add((e) => {
@@ -431,9 +430,18 @@ window.onload = async function () {
             if (password) {
                 let userInput = "";
                 if (lang === 'ja') {
-                    userInput = prompt("パスワードを入力してください");
+                    userInput = prompt("パスワードを入力してください\n※マイクラで!nameと打つと確認できます");
                 } else {
-                    userInput = prompt("Please enter password");
+                    userInput = prompt("Please enter password\n*You can check it by typing !name in Minecraft");
+                }
+                if (userInput === null) {
+                    if (lang === 'ja') {
+                        alert("パスワードが違います");
+                    } else {
+                        alert("Incorrect password");
+                    }
+                    socket.close();
+                    return;
                 }
                 if (userInput == passwords[userName]) {
                     socket.close();
@@ -492,11 +500,12 @@ function adjustVolume(mediaElement, pos1, pos2, name) {
     const distance = calculateDistance(pos1, pos2);
     const minVolume = 0;
     const volume = Math.max(minVolume, 1 - (distance / serverDistance)); // serverDistance を使用
+    volume = volume * SliderVolume
     if (volume == 0) {
         mediaElement.volume = minVolume;
         mediaElement.muted = true;
     } else {
-        mediaElement.volume = volume * SliderVolume
+        mediaElement.volume = volume;
         mediaElement.muted = false;
     }
 }
