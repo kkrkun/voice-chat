@@ -1,6 +1,6 @@
 const { nowInSec, SkyWayAuthToken, SkyWayContext, SkyWayRoom, SkyWayStreamFactory, uuidV4 } = skyway_room;
 
-const url = 'wss://kkryade1212.tcpexposer.com'; //サーバー側と接続するためのws/// ws to connect with the server side
+let url; //サーバー側と接続するためのws/// ws to connect with the server side
 const slider = {};
 let Members = 0;
 const userLang = navigator.language || navigator.userLanguage;
@@ -67,8 +67,9 @@ async function establishWebSocketConnection() {
 
 async function connectvc(userName) {
     try {
+        const address = document.getElementById('address-input' + (lang === 'ja' ? '-jp' : '')).value.trim();
         // WebSocketでapp_idとsecret_idを取得
-        const { app_id, secret_key } = await fetchAppIdAndSecretId();
+        const { app_id, secret_key } = await fetchAppIdAndSecretId(address);
 
         // Tokenの作成
         const Token = new SkyWayAuthToken({
@@ -413,6 +414,8 @@ window.onload = async function () {
     const joinButton = document.getElementById('join' + (lang === 'ja' ? '-jp' : ''));
     joinButton.onclick = async () => {
         const userName = document.getElementById('user-name' + (lang === 'ja' ? '-jp' : '')).value.trim();
+        const address = document.getElementById('address-input' + (lang === 'ja' ? '-jp' : '')).value.trim();
+        url = `wss://${address}.tcpexposer.com`;
         if (userName === '') {
             if (lang === 'ja') {
                 alert('名前を入力してください');
