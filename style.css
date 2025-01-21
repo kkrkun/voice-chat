@@ -7,6 +7,38 @@ body {
   padding: 0px;
 }
 
+.ad-container {
+  position: fixed;
+  left: 0; /* 右端に固定 */
+  transform: translateY(-50%); /* 中央に配置するために位置を調整 */
+  z-index: 1000; /* 他の要素の上に表示 */
+}
+
+.ad-left {
+  position: fixed;
+  bottom: 0px; /* 下から10pxの位置 */
+  left: 0px; /* 右から10pxの位置 */
+  z-index: 1000; /* 広告を他の要素の上に表示 */
+}
+
+.ad-right {
+  position: fixed;
+  bottom: 0px; /* 下から10pxの位置 */
+  right: 0px; /* 右から10pxの位置 */
+  z-index: 1000; /* 広告を他の要素の上に表示 */
+}
+
+.switch-language-btn {
+  background-color: #4CAF50; /* ボタンの背景色 */
+  color: white; /* ボタンの文字色 */
+  font-size: 16px; /* 文字サイズ */
+  padding: 10px 20px; /* ボタンの内側の余白 */
+  border: none; /* 枠線なし */
+  border-radius: 5px; /* 角を丸くする */
+  cursor: pointer; /* マウスカーソルをポインタにする */
+  transition: background-color 0.3s; /* 背景色の変化を滑らかにする */
+}
+
 /* ダークモードのスタイル */
 @media (prefers-color-scheme: dark) {
   body {
