@@ -4,7 +4,69 @@ let url; //サーバー側と接続するためのws/// ws to connect with the s
 const slider = {};
 let Members = 0;
 const userLang = navigator.language || navigator.userLanguage;
-let lang = userLang.startsWith('ja') ? 'ja' : 'en';
+let lang;
+document.addEventListener("DOMContentLoaded", function () {
+    // ブラウザの言語設定を取得
+    const userLang = navigator.language || navigator.userLanguage;
+    lang = userLang.startsWith('ja') ? 'ja' : 'en';
+
+    // すべての言語コンテンツを非表示にする
+    const contents = document.querySelectorAll('.language-content');
+    contents.forEach(content => {
+        content.style.display = 'none';
+    });
+
+    // 選択した言語のコンテンツを表示
+    document.getElementById(lang).style.display = 'block';
+
+    // 画面幅でPCかスマホを判定
+    const isPC = window.matchMedia("(min-width: 768px)").matches;
+
+    // PCの場合は日本語用広告を表示
+    if (isPC) {
+        if (userLang.startsWith('ja')) {
+            document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
+        } else {
+            document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
+        }
+    } else {
+        if (userLang.startsWith('ja')) {
+            document.getElementById('ad-japanese-phone').style.display = 'block';  // 日本語用広告
+        } else {
+            document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
+        }
+    }
+    // 言語切り替えボタンの動作
+    const switchButton = document.getElementById('switch-language');
+    switchButton.addEventListener('click', function () {
+        // 言語切り替え
+        lang = 'ja';
+        document.getElementById('en').style.display = 'none';
+        document.getElementById('ja').style.display = 'block';
+        if (isPC) {
+            document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
+            document.getElementById('ad-other-pc').style.display = 'none';  // 日本語以外用広告
+        } else {
+            document.getElementById('ad-japanese-phone').style.display = 'block';  // 日本語用広告
+            document.getElementById('ad-other-phone').style.display = 'none';  // 日本語以外用広告
+        }
+    });
+    const switchButton_ja = document.getElementById('switch-language-jp');
+    switchButton_ja.addEventListener('click', function () {
+        // 言語切り替え
+        lang = 'en';
+        document.getElementById('ja').style.display = 'none';
+        document.getElementById('en').style.display = 'block';
+        if (isPC) {
+            document.getElementById('ad-japanese-pc').style.display = 'none';  // 日本語用広告
+            document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
+        } else {
+            document.getElementById('ad-japanese-phone').style.display = 'none';  // 日本語用広告
+            document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
+        }
+    });
+});
+
 
 async function fetchAppIdAndSecretId() {
     const socket = new WebSocket(url);
