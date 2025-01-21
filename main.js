@@ -4,11 +4,10 @@ let url; //サーバー側と接続するためのws/// ws to connect with the s
 const slider = {};
 let Members = 0;
 const userLang = navigator.language || navigator.userLanguage;
-let lang;
+let lang = userLang.startsWith('ja') ? 'ja' : 'en';
 document.addEventListener("DOMContentLoaded", function () {
     // ブラウザの言語設定を取得
     const userLang = navigator.language || navigator.userLanguage;
-    lang = userLang.startsWith('ja') ? 'ja' : 'en';
 
     // すべての言語コンテンツを非表示にする
     const contents = document.querySelectorAll('.language-content');
