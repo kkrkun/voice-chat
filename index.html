@@ -80,19 +80,46 @@
 
             // 選択した言語のコンテンツを表示
             document.getElementById(language).style.display = 'block';
+
+            // 画面幅でPCかスマホを判定
+            const isPC = window.matchMedia("(min-width: 768px)").matches;
+
+            // PCの場合は日本語用広告を表示
+            if (isPC) {
+                if (userLang.startsWith('ja')) {
+                    document.getElementById('ad-japanese').style.display = 'block';  // 日本語用広告
+                } else {
+                    document.getElementById('ad-other').style.display = 'block';  // 日本語以外用広告
+                }
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.js"></script>
     <script src="main.js"></script>
+    <!-- admax -->
+    <script src="https://adm.shinobi.jp/s/c087625dd67bf7563ffd6482f02de883"></script>
+    <script src="https://adm.shinobi.jp/s/74f8b92f4c117a41ff8597e01bbf642b"></script>
+    <div class="ad-left">
+        <script src="https://adm.shinobi.jp/s/017faa1a085344202b155452555c1aa5"></script>
+    </div>
+    <!-- 日本語用の広告 -->
+    <div id="ad-japanese" style="display: none;">
+        <script src="https://adm.shinobi.jp/s/037c7ed9a46e59ad7716dee33c91d8d5"></script>
+    </div>
+
+    <!-- 日本語以外の言語用の広告 -->
+    <div id="ad-other" style="display: none;">
         <script type="text/javascript">
-        atOptions = {
-            'key' : '40738661d4c2d5ac48272bcef47f0d99',
-            'format' : 'iframe',
-            'height' : 90,
-            'width' : 728,
-            'params' : {}
-        };
-    </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/40738661d4c2d5ac48272bcef47f0d99/invoke.js"></script>
+            atOptions = {
+                'key': '40738661d4c2d5ac48272bcef47f0d99',
+                'format': 'iframe',
+                'height': 90,
+                'width': 728,
+                'params': {}
+            };
+        </script>
+        <script type="text/javascript"
+            src="//heartilyfootindebted.com/40738661d4c2d5ac48272bcef47f0d99/invoke.js"></script>
+    </div>
 </body>
 </html>
