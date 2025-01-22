@@ -3,8 +3,10 @@ const { nowInSec, SkyWayAuthToken, SkyWayContext, SkyWayRoom, SkyWayStreamFactor
 let url; //サーバー側と接続するためのws/// ws to connect with the server side
 const slider = {};
 let Members = 0;
+let nowAd;
 const userLang = navigator.language || navigator.userLanguage;
-let lang = userLang.startsWith('ja') ? 'ja' : 'en';
+lang = userLang.startsWith('ja') ? 'ja' : 'en';
+let isPC;
 document.addEventListener("DOMContentLoaded", function () {
     // ブラウザの言語設定を取得
     const userLang = navigator.language || navigator.userLanguage;
@@ -20,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function checkHeight() {
         // 画面幅でPCかスマホを判定
-        const isPC = window.matchMedia("(min-width: 768px)").matches;
+        isPC = window.matchMedia("(min-width: 768px)").matches;
 
         // PCの場合は日本語用広告を表示
         if (isPC) {
@@ -33,6 +35,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             } else {
                 document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
+                if (window.matchMedia("(min-height: 850px)").matches) {
+                    document.getElementById('ad-other2-pc').style.display = 'block';  // 日本語用広告
+                } else {
+                    document.getElementById('ad-other2-pc').style.display = 'none';  // 850px未満の場合は非表示
+                }
             }
         } else {
             if (userLang.startsWith('ja')) {
@@ -70,6 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('en').style.display = 'block';
         if (isPC) {
             document.getElementById('ad-japanese-pc').style.display = 'none';  // 日本語用広告
+            document.getElementById('ad-japanese2-pc').style.display = 'none';  // 日本語用広告
             document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
         } else {
             document.getElementById('ad-japanese-phone').style.display = 'none';  // 日本語用広告
@@ -188,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 一定間隔で広告を変更（例: 5秒ごと）
     setInterval(updateAd, 20000);
 });
+
 
 
 async function fetchAppIdAndSecretId() {
