@@ -250,16 +250,14 @@ document.addEventListener("DOMContentLoaded", function () {
     function adBlockDetected() {
         /*広告ブロッカー検知時の動作*/
         document.getElementById("kk-detected").style.display = "flex";
-        console.log("広告ブロッカー検知");
+        console.log("広告ブロッカー検知しました");
     }
     function adBlockNotDetected() {
         /*広告ブロッカー未検知時の動作*/
         document.getElementById("kk-detected").style.display = "none";
-        console.log("広告ブロッカー未検知");
+        console.log("広告ブロッカー未検知です");
     }
     if (typeof blockAdBlock === "undefined") {
-        /*blockadblock.jsが読み込めない場合は広告ブロッカー検知扱い*/
-        adBlockDetected();
     } else {
         /*広告ブロッカー検知*/
         blockAdBlock.onDetected(adBlockDetected);
