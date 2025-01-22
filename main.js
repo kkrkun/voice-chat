@@ -8,6 +8,24 @@ const userLang = navigator.language || navigator.userLanguage;
 let lang = userLang.startsWith('ja') ? 'ja' : 'en';
 let isPC;
 
+    function adBlockDetected() {
+        /*広告ブロッカー検知時の動作*/
+        document.getElementById("kk-detected").style.display = "flex";
+        console.log("広告ブロッカー検知しました");
+    }
+    function adBlockNotDetected() {
+        /*広告ブロッカー未検知時の動作*/
+        document.getElementById("kk-detected").style.display = "none";
+        console.log("広告ブロッカー未検知です");
+    }
+    if (typeof blockAdBlock === "undefined") {
+    } else {
+        /*広告ブロッカー検知*/
+        blockAdBlock.onDetected(adBlockDetected);
+        /*広告ブロッカー未検知*/
+        blockAdBlock.onNotDetected(adBlockNotDetected);
+    }
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // 選択した言語のコンテンツを表示
@@ -247,23 +265,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // 一定間隔で広告を変更（例: 5秒ごと）
     setInterval(updateAd, 20000);
 
-    function adBlockDetected() {
-        /*広告ブロッカー検知時の動作*/
-        document.getElementById("kk-detected").style.display = "flex";
-        console.log("広告ブロッカー検知しました");
-    }
-    function adBlockNotDetected() {
-        /*広告ブロッカー未検知時の動作*/
-        document.getElementById("kk-detected").style.display = "none";
-        console.log("広告ブロッカー未検知です");
-    }
-    if (typeof blockAdBlock === "undefined") {
-    } else {
-        /*広告ブロッカー検知*/
-        blockAdBlock.onDetected(adBlockDetected);
-        /*広告ブロッカー未検知*/
-        blockAdBlock.onNotDetected(adBlockNotDetected);
-    }
     const continueWithoutAds = document.getElementById('continueWithout');
 
     continueWithoutAds.addEventListener('click', function () {
