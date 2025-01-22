@@ -24,11 +24,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('leave').textContent = "退出";
         document.getElementById('participant').textContent = "参加者リスト";
         document.getElementById('switch-language').textContent = "Switch to English";
-        document.getElementById('use_adblock').textContent = "あなたはAdblockerを使用しています！";
+        document.getElementById('use').textContent = "あなたはAdblockerを使用しています！";
         document.getElementById('creator').textContent = "製作者が泣いてるよ";
         document.getElementById('disable').textContent = "広告ブロッカーを無効にしてよ！";
         document.getElementById('creator2').textContent = "↓↓↓製作者はいつも押してる↓↓↓";
-        document.getElementById('continueWithoutAds').innerHTML = "そんなのシラネ―無視だー<span id='countdown'></span>";
+        document.getElementById('continueWithout').innerHTML = "そんなのシラネ―無視だー<span id='countdown'></span>";
     }
 
     function checkHeight() {
@@ -84,11 +84,11 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('leave').textContent = "退出";
             document.getElementById('participant').textContent = "参加者リスト";
             document.getElementById('switch-language').textContent = "Switch to English";
-            document.getElementById('use_adblock').textContent = "あなたはAdblockerを使用しています！";
+            document.getElementById('use').textContent = "あなたはAdblockerを使用しています！";
             document.getElementById('creator').textContent = "製作者が泣いています";
             document.getElementById('disable').textContent = "広告ブロッカーを無効にしてよ！";
             document.getElementById('creator2').textContent = "↓↓↓製作者はいつも押してる↓↓";
-            document.getElementById('continueWithoutAds').innerHTML = "そんなのシラネ―無視だー<span id='countdown'></span>";
+            document.getElementById('continueWithout').innerHTML = "そんなのシラネ―無視だー<span id='countdown'></span>";
             if (isPC) {
                 document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
                 document.getElementById('ad-other-pc').style.display = 'none';  // 日本語以外用広告
@@ -116,11 +116,11 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('leave').textContent = "Leave";
             document.getElementById('participant').textContent = "Participant List";
             document.getElementById('switch-language').textContent = "日本語に切り替え";
-            document.getElementById('use_adblock').textContent = "You are using an Adblocker!";
+            document.getElementById('use').textContent = "You are using an Adblocker!";
             document.getElementById('creator').textContent = "The creator is in tears.";
             document.getElementById('disable').textContent = "We would greatly appreciate it if you could disable your ad blocker.";
             document.getElementById('creator2').textContent = "";
-            document.getElementById('continueWithoutAds').innerHTML = "Continue with Adblocker anyway<span id='countdown'></span>";
+            document.getElementById('continueWithout').innerHTML = "Continue with Adblocker anyway<span id='countdown'></span>";
             if (isPC) {
                 document.getElementById('ad-japanese-pc').style.display = 'none';  // 日本語用広告
                 document.getElementById('ad-japanese2-pc').style.display = 'none';  // 日本語用広告
@@ -249,11 +249,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function adBlockDetected() {
         /*広告ブロッカー検知時の動作*/
-        document.getElementById("adblock-detected").style.display = "flex";
+        document.getElementById("kk-detected").style.display = "flex";
     }
     function adBlockNotDetected() {
         /*広告ブロッカー未検知時の動作*/
-        document.getElementById("adblock-detected").style.display = "none";
+        document.getElementById("kk-detected").style.display = "none";
     }
     if (typeof blockAdBlock === "undefined") {
         /*blockadblock.jsが読み込めない場合は広告ブロッカー検知扱い*/
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
         /*広告ブロッカー未検知*/
         blockAdBlock.onNotDetected(adBlockNotDetected);
     }
-    const continueWithoutAds = document.getElementById('continueWithoutAds');
+    const continueWithoutAds = document.getElementById('continueWithout');
 
     continueWithoutAds.addEventListener('click', function () {
         let countdownElement = document.getElementById("countdown");
@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (counter === 0) {
                 clearInterval(interval); // カウントダウン停止
-                document.getElementById("adblock-detected").style.display = "none"; // 非表示にする
+                document.getElementById("kk-detected").style.display = "none"; // 非表示にする
             }
         }, 1000); // 1秒ごとに実行
     });
