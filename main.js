@@ -10,7 +10,7 @@ let isPC;
 document.addEventListener("DOMContentLoaded", function () {
 
     // 選択した言語のコンテンツを表示
-    if (lang = 'ja') {
+    if (lang === 'ja') {
         document.getElementById('my-servers').style.display = 'block';
         document.getElementById('header-text').textContent = "近接VC in Mcbe";
         document.getElementById('name-disp').innerHTML = "ゲーマータグ: <span id='my-name'></span>";
@@ -28,10 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function checkHeight() {
         // 画面幅でPCかスマホを判定
         isPC = window.matchMedia("(min-width: 768px)").matches;
-
+        console.log(lang)
         // PCの場合は日本語用広告を表示
         if (isPC) {
-            if (lang = 'ja') {
+            if (lang === 'ja') {
                 document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
                 if (window.matchMedia("(min-height: 850px)").matches) {
                     document.getElementById('ad-japanese2-pc').style.display = 'block';  // 日本語用広告
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         } else {
-            if (lang = 'ja') {
+            if (lang === 'ja') {
                 document.getElementById('ad-japanese-phone').style.display = 'block';  // 日本語用広告
             } else {
                 document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const switchButton = document.getElementById('switch-language');
 
     switchButton.addEventListener('click', function () {
-        if (lang == 'en') {
+        if (lang === 'en') {
             // 言語切り替え
             lang = 'ja';
             document.getElementById('my-servers').style.display = 'block';
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (isPC) {
                 document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
                 document.getElementById('ad-other-pc').style.display = 'none';  // 日本語以外用広告
-                document.getElementById('ad-other-pc2').style.display = 'none';  // 日本語以外用広告
+                document.getElementById('ad-other2-pc').style.display = 'none';  // 日本語以外用広告
                 if (window.matchMedia("(min-height: 850px)").matches) {
                     document.getElementById('ad-japanese2-pc').style.display = 'block';  // 日本語用広告
                 } else {
