@@ -5,7 +5,7 @@ const slider = {};
 let Members = 0;
 let nowAd;
 const userLang = navigator.language || navigator.userLanguage;
-lang = userLang.startsWith('ja') ? 'ja' : 'en';
+let lang = userLang.startsWith('ja') ? 'ja' : 'en';
 let isPC;
 document.addEventListener("DOMContentLoaded", function () {
     // ブラウザの言語設定を取得
