@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener('resize', checkHeight);
     // 言語切り替えボタンの動作
     const switchButton = document.getElementById('switch-language');
+
     switchButton.addEventListener('click', function () {
         if (lang == 'en') {
             // 言語切り替え
@@ -79,9 +80,13 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('switch-language').textContent = "Switch to English";
             if (isPC) {
                 document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
-                document.getElementById('ad-japanese2-pc').style.display = 'block';  // 日本語用広告
                 document.getElementById('ad-other-pc').style.display = 'none';  // 日本語以外用広告
                 document.getElementById('ad-other-pc2').style.display = 'none';  // 日本語以外用広告
+                if (window.matchMedia("(min-height: 850px)").matches) {
+                    document.getElementById('ad-japanese2-pc').style.display = 'block';  // 日本語用広告
+                } else {
+                    document.getElementById('ad-japanese2-pc').style.display = 'none';  // 850px未満の場合は非表示
+                }
             } else {
                 document.getElementById('ad-japanese-phone').style.display = 'block';  // 日本語用広告
                 document.getElementById('ad-other-phone').style.display = 'none';  // 日本語以外用広告
@@ -104,7 +109,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById('ad-japanese-pc').style.display = 'none';  // 日本語用広告
                 document.getElementById('ad-japanese2-pc').style.display = 'none';  // 日本語用広告
                 document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
-                document.getElementById('ad-other-pc2').style.display = 'block';  // 日本語以外用広告
+                if (window.matchMedia("(min-height: 850px)").matches) {
+                    document.getElementById('ad-other2-pc').style.display = 'block';  // 日本語用広告
+                } else {
+                    document.getElementById('ad-other2-pc').style.display = 'none';  // 850px未満の場合は非表示
+                }
             } else {
                 document.getElementById('ad-japanese-phone').style.display = 'none';  // 日本語用広告
                 document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
