@@ -8,15 +8,16 @@ const userLang = navigator.language || navigator.userLanguage;
 let lang = userLang.startsWith('ja') ? 'ja' : 'en';
 let isPC;
 
+document.addEventListener("DOMContentLoaded", function () {
     function adBlockDetected() {
         /*広告ブロッカー検知時の動作*/
         document.getElementById("kk-detected").style.display = "flex";
-        console.log("広告ブロッカー検知しました");
+        console.log("広告ブロッカー検知");
     }
     function adBlockNotDetected() {
         /*広告ブロッカー未検知時の動作*/
         document.getElementById("kk-detected").style.display = "none";
-        console.log("広告ブロッカー未検知です");
+        console.log("広告ブロッカー未検知");
     }
     if (typeof blockAdBlock === "undefined") {
     } else {
@@ -25,8 +26,6 @@ let isPC;
         /*広告ブロッカー未検知*/
         blockAdBlock.onNotDetected(adBlockNotDetected);
     }
-
-document.addEventListener("DOMContentLoaded", function () {
 
     // 選択した言語のコンテンツを表示
     if (lang === 'ja') {
