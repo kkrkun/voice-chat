@@ -167,9 +167,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const adsContainer = document.getElementById(`ad-japanese-pc${ad_ja_pc_num}`);
             if (adsContainer) {
-                if (ad_ja_pc_num == 4) {
-                    console.log(randomAd)
-                }
                 if (randomAd === "adMax") {
                     adsContainer.style.display = "none"; // 元の広告を非表示
                     const adsContainer2 = document.getElementById(`ad-japanese-pc${ad_ja_pc_num}-2`);
