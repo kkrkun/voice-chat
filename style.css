@@ -7,25 +7,36 @@ body {
   padding: 0px;
 }
 
-.ad-container {
-  position: fixed;
-  left: 0; /* 右端に固定 */
-  transform: translateY(-50%); /* 中央に配置するために位置を調整 */
-  z-index: 1000; /* 他の要素の上に表示 */
-}
-
 .ad-left {
   position: fixed;
-  bottom: 0px; /* 下から10pxの位置 */
-  left: 0px; /* 右から10pxの位置 */
+  top: 0px; /* 下から0pxの位置 */
+  left: 0px; /* 右から0pxの位置 */
   z-index: 1000; /* 広告を他の要素の上に表示 */
+}
+
+.ad-left2 {
+  position: fixed;
+  top: 600px; /* 下から0pxの位置 */
+  left: 0px; /* 右から0pxの位置 */
+  z-index: 1000; /* 広告を他の要素の上に表示 */
+  transform: scale(1); /* デフォルト倍率（1倍） */
+  transform-origin: top left; /* スケーリングの基準点を左上に変更 */
 }
 
 .ad-right {
   position: fixed;
-  bottom: 0px; /* 下から10pxの位置 */
-  right: 0px; /* 右から10pxの位置 */
+  top: 0px; /* 下から0pxの位置 */
+  right: 0px; /* 右から0pxの位置 */
   z-index: 1000; /* 広告を他の要素の上に表示 */
+}
+
+.ad-right2 {
+  position: fixed;
+  top: 600px; /* 下から0pxの位置 */
+  right: 5px; /* 右から0pxの位置 */
+  z-index: 1000; /* 広告を他の要素の上に表示 */
+  transform: scale(1); /* デフォルト倍率（1倍） */
+  transform-origin: top right; /* スケーリングの基準点を左上に変更 */
 }
 
 .switch-language-btn {
