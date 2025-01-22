@@ -9,10 +9,12 @@
   function adBlockDetected() {
     /*広告ブロッカー検知時の動作*/
     jQuery(".xxx").show();
+console.log("test2")
   }
   function adBlockNotDetected() {
     /*広告ブロッカー未検知時の動作*/
     jQuery(".xxx").hide();
+    console.log("test3")
   }
   if (typeof blockAdBlock === "undefined") {
     /*blockadblock.jsが読み込めない場合は広告ブロッカー検知扱い*/
