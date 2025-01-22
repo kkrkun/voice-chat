@@ -63,7 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('ja').style.display = 'block';
         if (isPC) {
             document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
+            document.getElementById('ad-japanese2-pc').style.display = 'block';  // 日本語用広告
             document.getElementById('ad-other-pc').style.display = 'none';  // 日本語以外用広告
+            document.getElementById('ad-other-pc2').style.display = 'none';  // 日本語以外用広告
         } else {
             document.getElementById('ad-japanese-phone').style.display = 'block';  // 日本語用広告
             document.getElementById('ad-other-phone').style.display = 'none';  // 日本語以外用広告
@@ -79,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('ad-japanese-pc').style.display = 'none';  // 日本語用広告
             document.getElementById('ad-japanese2-pc').style.display = 'none';  // 日本語用広告
             document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
+            document.getElementById('ad-other-pc2').style.display = 'block';  // 日本語以外用広告
         } else {
             document.getElementById('ad-japanese-phone').style.display = 'none';  // 日本語用広告
             document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
