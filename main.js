@@ -250,6 +250,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function adBlockDetected() {
         /*広告ブロッカー検知時の動作*/
         document.getElementById("kk-detected").style.display = "flex";
+        console.log("広告ブロッカー検知");
+    }
+    function adBlockNotDetected() {
+        /*広告ブロッカー未検知時の動作*/
+        document.getElementById("kk-detected").style.display = "none";
+        console.log("広告ブロッカー未検知");
     }
     if (typeof blockAdBlock === "undefined") {
         /*blockadblock.jsが読み込めない場合は広告ブロッカー検知扱い*/
@@ -257,6 +263,8 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         /*広告ブロッカー検知*/
         blockAdBlock.onDetected(adBlockDetected);
+        /*広告ブロッカー未検知*/
+        blockAdBlock.onNotDetected(adBlockNotDetected);
     }
     const continueWithoutAds = document.getElementById('continueWithout');
 
