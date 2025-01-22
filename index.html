@@ -1,64 +1,204 @@
 <!DOCTYPE html>
-<html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AdBlock Detector</title>
-  <script type="text/javascript" src="blockadblock.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <style>
-    #kk-detected {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background-color: #ffcccc;
-      height: 100vh;
-      text-align: center;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <title>Proximity VC in Mcbe</title>
 </head>
+
 <body>
-  <div id="kk-detected">
+  <div id="content" class="content">
+    <!-- English content -->
+    <div class="language-content">
+      <header>
+        <h1 id='header-text' class="header-text">Proximity VC in Mcbe</h1>
+      </header>
+      <p id="id-disp">ID: <span id="my-id"></span></p>
+      <p id="name-disp">GamerTag: <span id="my-name"></span></p>
+      <p id="Menber-disp">Participants: <span id="Members">undefined</span></p>
+      <div>
+        <label id="address">Address: </label><input id="address-input" type="text" />
+      </div>
+      <div>
+        <label id="gamertag">GamerTag: </label><input id="user-name" type="text" />
+      </div>
+      <div>
+        <button id="join" class="join-btn">Connect</button>
+      </div>
+      <button id="NonMute-btn" oncontextmenu="return false;">Mute ON/OFF</button>
+      <p id="MuteInfo">Not connected</p>
+      <p><button id="leave" class="leave-btn">Leave</button></p>
+      <button id="switch-language" class="switch-language-btn">日本語に切り替え</button>
+      <div id="button-area"></div>
+      <div id="remote-media-area"></div>
+      <div>
+        <h2 id="participant">Participant List</h2>
+        <ul id="participant-list"></ul>
+      </div>
+    </div>
+
+    <!-- Japanese content -->
+    <div class="language-content" id="my-servers" style="display: none;">
+      <h2>製作者が運営してるサーバー</h2>
+      <div class="my-server">
+        <a href="https://disboard.org/ja/server/1064309785236865064" target="_blank" rel="noopener noreferrer">
+          <img src="jrpg.gif" alt="あなたのサイトの紹介画像" style="width:300px; height:auto; border:0;">
+        </a>
+        <a href="https://disboard.org/ja/server/1300487809177616445" target="_blank" rel="noopener noreferrer">
+          <img src="aooni.png" alt="あなたのサイトの紹介画像" style="width:300px; height:auto; border:0;">
+        </a>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@skyway-sdk/room/dist/skyway_room-latest.js"></script>
+  <script src="main.js"></script>
+  <script type="text/javascript" src="blockadblock.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <div id="kk-detected" style="display: none;">
     <h1 id="use">You are using an Adblocker!</h1>
     <p id="creator">The creator is in tears.</p>
     <p id="disable">We would greatly appreciate it if you could disable your ad blocker.</p>
     <p id="creator2"></p>
     <button id="continueWithout">Continue with Adblocker anyway<span id="countdown"></span></button>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      function adBlockDetected() {
-          document.getElementById("kk-detected").style.display = "flex";
-      }
-      function adBlockNotDetected() {
-          document.getElementById("kk-detected").style.display = "none";
-      }
-      if (typeof blockAdBlock === "undefined") {
-          adBlockDetected();
-      } else {
-          blockAdBlock.onDetected(adBlockDetected);
-          blockAdBlock.onNotDetected(adBlockNotDetected);
-      }
 
-      const continueWithoutAds = document.getElementById('continueWithout');
+  <!-- 日本語用の広告 -->
+  <div id="ad-japanese-pc" style="display: none;">
+    <div id="ad-japanese-pc1" class="ad-bottom"></div>
+    <div id="ad-japanese-pc2" class="ad-right" style="display: none;"></div>
+    <div id="ad-japanese-pc3" class="ad-left" style="display: none;"></div>
+    <div id="ad-japanese-pc1-2" class="ad-bottom" style="display: none;">
+      <div class="admax-ads" data-admax-id="037c7ed9a46e59ad7716dee33c91d8d5"
+        style="display:inline-block;width:728px;height:90px;"></div>
+      <script
+        type="text/javascript">(admaxads = window.admaxads || []).push({ admax_id: "037c7ed9a46e59ad7716dee33c91d8d5", type: "banner" });</script>
+      <script type="text/javascript" charset="utf-8" src="https://adm.shinobi.jp/st/t.js" async></script>
+    </div>
+    <div id="ad-japanese-pc2-2" style="display: none;" class="ad-right">
+      <div class="admax-ads" data-admax-id="017faa1a085344202b155452555c1aa5"
+        style="display:inline-block;width:160px;height:600px;"></div>
+      <script
+        type="text/javascript">(admaxads = window.admaxads || []).push({ admax_id: "017faa1a085344202b155452555c1aa5", type: "banner" });</script>
+      <script type="text/javascript" charset="utf-8" src="https://adm.shinobi.jp/st/t.js" async></script>
+    </div>
+    <div id="ad-japanese-pc3-2" style="display: none;" class="ad-left">
+      <div class="admax-ads" data-admax-id="e33cd468dd00c3fa905981e113399d1b"
+        style="display:inline-block;width:160px;height:600px;"></div>
+      <script
+        type="text/javascript">(admaxads = window.admaxads || []).push({ admax_id: "e33cd468dd00c3fa905981e113399d1b", type: "banner" });</script>
+      <script type="text/javascript" charset="utf-8" src="https://adm.shinobi.jp/st/t.js" async></script>
+    </div>
+  </div>
+  <div id="ad-japanese2-pc" style="display: none;">
+    <div id="ad-japanese-pc4" class="ad-right2" style="display: none;"></div>
+    <div id="ad-japanese-pc5" class="ad-left2" style="display: none;"></div>
+    <div id="ad-japanese-pc4-2" style="display: none;" class="ad-right2">
+      <div class="admax-ads" data-admax-id="ad890612da249c18733ec27ae7513071"
+        style="display:inline-block;width:300px;height:250px;"></div>
+      <script
+        type="text/javascript">(admaxads = window.admaxads || []).push({ admax_id: "ad890612da249c18733ec27ae7513071", type: "banner" });</script>
+      <script type="text/javascript" charset="utf-8" src="https://adm.shinobi.jp/st/t.js" async></script>
+    </div>
+    <div id="ad-japanese-pc5-2" style="display: none;" class="ad-left2">
+      <div class="admax-ads" data-admax-id="7573439253d05cb83525cbfecc3f8d06"
+        style="display:inline-block;width:300px;height:250px;"></div>
+      <script
+        type="text/javascript">(admaxads = window.admaxads || []).push({ admax_id: "7573439253d05cb83525cbfecc3f8d06", type: "banner" });</script>
+      <script type="text/javascript" charset="utf-8" src="https://adm.shinobi.jp/st/t.js" async></script>
+    </div>
+  </div>
+  <div id="ad-japanese-phone" style="display: none;">
+    <script
+      type="text/javascript">(admaxads = window.admaxads || []).push({ admax_id: "74f8b92f4c117a41ff8597e01bbf642b", type: "overlay" });</script>
+    <script type="text/javascript" charset="utf-8" src="https://adm.shinobi.jp/st/t.js" async></script>
+  </div>
 
-      continueWithoutAds.addEventListener('click', function () {
-          let countdownElement = document.getElementById("countdown");
-          let counter = 5;
-          countdownElement.textContent = ` ${counter}`;
-
-          let interval = setInterval(function () {
-              counter--;
-              countdownElement.textContent = ` ${counter}`;
-
-              if (counter === 0) {
-                  clearInterval(interval);
-                  document.getElementById("kk-detected").style.display = "none";
-              }
-          }, 1000);
-      });
-    });
-  </script>
+  <!-- 日本語以外の言語用の広告 -->
+  <div id="ad-other-pc" style="display: none;">
+    <div class="ad-bottom">
+      <script type="text/javascript">
+        atOptions = {
+          'key': '40738661d4c2d5ac48272bcef47f0d99',
+          'format': 'iframe',
+          'height': 90,
+          'width': 728,
+          'params': {}
+        };
+      </script>
+      <script type="text/javascript"
+        src="//heartilyfootindebted.com/40738661d4c2d5ac48272bcef47f0d99/invoke.js"></script>
+    </div>
+    <div class="ad-left">
+      <script type="text/javascript">
+        atOptions = {
+          'key': 'f9e297fbaee9edfb0f0685942f477d03',
+          'format': 'iframe',
+          'height': 600,
+          'width': 160,
+          'params': {}
+        };
+      </script>
+      <script type="text/javascript"
+        src="//heartilyfootindebted.com/f9e297fbaee9edfb0f0685942f477d03/invoke.js"></script>
+    </div>
+    <div class="ad-right">
+      <script type="text/javascript">
+        atOptions = {
+          'key': 'f9e297fbaee9edfb0f0685942f477d03',
+          'format': 'iframe',
+          'height': 600,
+          'width': 160,
+          'params': {}
+        };
+      </script>
+      <script type="text/javascript"
+        src="//heartilyfootindebted.com/f9e297fbaee9edfb0f0685942f477d03/invoke.js"></script>
+    </div>
+  </div>
+  <div id="ad-other2-pc" style="display: none;">
+    <div class="ad-left2">
+      <script type="text/javascript">
+        atOptions = {
+          'key': '7feb48769dbd956419f2c28cb851b319',
+          'format': 'iframe',
+          'height': 250,
+          'width': 300,
+          'params': {}
+        };
+      </script>
+      <script type="text/javascript"
+        src="//heartilyfootindebted.com/7feb48769dbd956419f2c28cb851b319/invoke.js"></script>
+    </div>
+    <div class="ad-right2">
+      <script type="text/javascript">
+        atOptions = {
+          'key': '7feb48769dbd956419f2c28cb851b319',
+          'format': 'iframe',
+          'height': 250,
+          'width': 300,
+          'params': {}
+        };
+      </script>
+      <script type="text/javascript"
+        src="//heartilyfootindebted.com/7feb48769dbd956419f2c28cb851b319/invoke.js"></script>
+    </div>
+  </div>
+  <div id="ad-other-phone" style="display: none;">
+    <script type="text/javascript">
+      atOptions = {
+        'key': 'da605f522e403c184248021382c14d2f',
+        'format': 'iframe',
+        'height': 50,
+        'width': 320,
+        'params': {}
+      };
+    </script>
+    <script type="text/javascript" src="//heartilyfootindebted.com/da605f522e403c184248021382c14d2f/invoke.js"></script>
+  </div>
 </body>
+
 </html>
