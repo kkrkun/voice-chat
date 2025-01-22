@@ -251,18 +251,12 @@ document.addEventListener("DOMContentLoaded", function () {
         /*広告ブロッカー検知時の動作*/
         document.getElementById("kk-detected").style.display = "flex";
     }
-    function adBlockNotDetected() {
-        /*広告ブロッカー未検知時の動作*/
-        document.getElementById("kk-detected").style.display = "none";
-    }
     if (typeof blockAdBlock === "undefined") {
         /*blockadblock.jsが読み込めない場合は広告ブロッカー検知扱い*/
         adBlockDetected();
     } else {
         /*広告ブロッカー検知*/
         blockAdBlock.onDetected(adBlockDetected);
-        /*広告ブロッカー未検知*/
-        blockAdBlock.onNotDetected(adBlockNotDetected);
     }
     const continueWithoutAds = document.getElementById('continueWithout');
 
