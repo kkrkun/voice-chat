@@ -1,29 +1,64 @@
-<script type="text/javascript" src="blockadblock.js"></script>
-<script
-  type="text/javascript"
-  src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"
-></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdBlock Detector</title>
+  <script type="text/javascript" src="./blockAdChecker.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <style>
+    #kk-detected {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffcccc;
+      height: 100vh;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="kk-detected">
+    <h1 id="use">You are using an Adblocker!</h1>
+    <p id="creator">The creator is in tears.</p>
+    <p id="disable">We would greatly appreciate it if you could disable your ad blocker.</p>
+    <p id="creator2"></p>
+    <button id="continueWithout">Continue with Adblocker anyway<span id="countdown"></span></button>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function adBlockDetected() {
+          document.getElementById("kk-detected").style.display = "flex";
+      }
+      function adBlockNotDetected() {
+          document.getElementById("kk-detected").style.display = "none";
+      }
+      if (typeof blockAdBlock === "undefined") {
+          adBlockDetected();
+      } else {
+          blockAdBlock.onDetected(adBlockDetected);
+          blockAdBlock.onNotDetected(adBlockNotDetected);
+      }
 
-<div class="xxx" style="display:block;">広告ブロッカーが有効です。</div>
-<script>
-  function adBlockDetected() {
-    /*広告ブロッカー検知時の動作*/
-    jQuery(".xxx").show();
-console.log("test2")
-  }
-  function adBlockNotDetected() {
-    /*広告ブロッカー未検知時の動作*/
-    jQuery(".xxx").hide();
-    console.log("test3")
-  }
-  if (typeof blockAdBlock === "undefined") {
-    /*blockadblock.jsが読み込めない場合は広告ブロッカー検知扱い*/
-    adBlockDetected();
-    console.log("test")
-  } else {
-    /*広告ブロッカー検知*/
-    blockAdBlock.onDetected(adBlockDetected);
-    /*広告ブロッカー未検知*/
-    blockAdBlock.onNotDetected(adBlockNotDetected);
-  }
-</script>
+      const continueWithoutAds = document.getElementById('continueWithout');
+
+      continueWithoutAds.addEventListener('click', function () {
+          let countdownElement = document.getElementById("countdown");
+          let counter = 5;
+          countdownElement.textContent = ` ${counter}`;
+
+          let interval = setInterval(function () {
+              counter--;
+              countdownElement.textContent = ` ${counter}`;
+
+              if (counter === 0) {
+                  clearInterval(interval);
+                  document.getElementById("kk-detected").style.display = "none";
+              }
+          }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>
