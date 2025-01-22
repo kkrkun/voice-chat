@@ -41,7 +41,7 @@ body {
   }
 }
 
-#adblock-detected {
+#kk-detected {
   display: none; /* 初期状態では非表示 */
   position: fixed;
   top: 0;
@@ -58,22 +58,22 @@ body {
   z-index: 9999;
 }
 
-#adblock-detected h1 {
+#kk-detected h1 {
   font-size: 2rem;
   margin-bottom: 20px;
 }
 
-#adblock-detected p {
+#kk-detected p {
   font-size: 1.2rem;
   margin-bottom: 30px;
 }
 
-#adblock-detected .button-container {
+#kk-detected .button-container {
   display: inline-flex; /* ボタンとカウントダウンを横並びにする */
   align-items: center; /* 縦位置を中央揃え */
 }
 
-#adblock-detected button {
+#kk-detected button {
   padding: 10px 20px;
   background-color: white;
   color: #ff4a6d;
@@ -83,7 +83,7 @@ body {
   cursor: pointer;
 }
 
-#adblock-detected button:hover {
+#kk-detected button:hover {
   background-color: #ffe0e5;
 }
 
@@ -91,10 +91,6 @@ body {
   margin-left: 10px; /* ボタンの右側に余白を作成 */
   font-weight: bold;
   font-size: 1rem; /* ボタンに揃える */
-}
-
-#adblock-detected button:hover {
-  background-color: #ffe0e5;
 }
 
 .ad-bottom {
