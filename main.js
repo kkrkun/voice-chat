@@ -12,12 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function adBlockDetected() {
         /*広告ブロッカー検知時の動作*/
         document.getElementById("kk-detected").style.display = "flex";
-        console.log("広告ブロッカー検知しました");
+        console.log("広告ブロッカー検知");
     }
     function adBlockNotDetected() {
         /*広告ブロッカー未検知時の動作*/
-        document.getElementById("kk-detected").style.display = "flex";
-        console.log("広告ブロッカー未検知です");
+        document.getElementById("kk-detected").style.display = "none";
+        console.log("広告ブロッカー未検知");
     }
     if (typeof blockAdBlock === "undefined") {
     } else {
