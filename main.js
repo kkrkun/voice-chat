@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     function adBlockNotDetected() {
         /*広告ブロッカー未検知時の動作*/
-        document.getElementById("kk-detected").style.display = "none";
+        document.getElementById("kk-detected").style.display = "flex";
         console.log("広告ブロッカー未検知");
     }
     if (typeof blockAdBlock === "undefined") {
