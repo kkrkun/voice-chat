@@ -18,23 +18,35 @@ document.addEventListener("DOMContentLoaded", function () {
     // 選択した言語のコンテンツを表示
     document.getElementById(lang).style.display = 'block';
 
-    // 画面幅でPCかスマホを判定
-    const isPC = window.matchMedia("(min-width: 768px)").matches;
+    function checkHeight() {
+        // 画面幅でPCかスマホを判定
+        const isPC = window.matchMedia("(min-width: 768px)").matches;
 
-    // PCの場合は日本語用広告を表示
-    if (isPC) {
-        if (userLang.startsWith('ja')) {
-            document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
+        // PCの場合は日本語用広告を表示
+        if (isPC) {
+            if (userLang.startsWith('ja')) {
+                document.getElementById('ad-japanese-pc').style.display = 'block';  // 日本語用広告
+                if (window.matchMedia("(min-height: 850px)").matches) {
+                    document.getElementById('ad-japanese2-pc').style.display = 'block';  // 日本語用広告
+                } else {
+                    document.getElementById('ad-japanese2-pc').style.display = 'none';  // 850px未満の場合は非表示
+                }
+            } else {
+                document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
+            }
         } else {
-            document.getElementById('ad-other-pc').style.display = 'block';  // 日本語以外用広告
-        }
-    } else {
-        if (userLang.startsWith('ja')) {
-            document.getElementById('ad-japanese-phone').style.display = 'block';  // 日本語用広告
-        } else {
-            document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
+            if (userLang.startsWith('ja')) {
+                document.getElementById('ad-japanese-phone').style.display = 'block';  // 日本語用広告
+            } else {
+                document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
+            }
         }
     }
+
+    checkHeight();
+
+    // 画面のリサイズ時に再度チェック
+    window.addEventListener('resize', checkHeight);
     // 言語切り替えボタンの動作
     const switchButton = document.getElementById('switch-language');
     switchButton.addEventListener('click', function () {
@@ -64,6 +76,120 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('ad-other-phone').style.display = 'block';  // 日本語以外用広告
         }
     });
+
+    // 広告の選択肢を定義
+    const pc_yoko_ads = [
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZES+CIP5PU+348+6OHEP" rel="nofollow">
+<img border="0" width="728" height="90" alt="" src="https://www27.a8.net/svt/bgt?aid=250122052757&wid=001&eno=01&mid=s00000000404001122000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=44WZES+CIP5PU+348+6OHEP" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZES+CQFSKY+348+1C71F5" rel="nofollow">
+<img border="0" width="728" height="90" alt="" src="https://www27.a8.net/svt/bgt?aid=250122052770&wid=001&eno=01&mid=s00000000404008095000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=44WZES+CQFSKY+348+1C71F5" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZES+CDXOVM+4EKC+62U35" rel="nofollow">
+<img border="0" width="600" height="100" alt="" src="https://www23.a8.net/svt/bgt?aid=250122052749&wid=001&eno=01&mid=s00000020550001021000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=44WZES+CDXOVM+4EKC+62U35" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+64VU7M+50+7S05SX" rel="nofollow">
+<img border="0" width="728" height="90" alt="" src="https://www25.a8.net/svt/bgt?aid=250122056371&wid=001&eno=01&mid=s00000000018047030000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=44WZEW+64VU7M+50+7S05SX" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+A7XWMQ+50+7A9VEP" rel="nofollow">
+<img border="0" width="728" height="90" alt="" src="https://www27.a8.net/svt/bgt?aid=250122056618&wid=001&eno=01&mid=s00000000018044052000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=44WZEW+A7XWMQ+50+7A9VEP" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+A7XWMQ+50+7A6FY9" rel="nofollow">
+<img border="0" width="728" height="90" alt="" src="https://www26.a8.net/svt/bgt?aid=250122056618&wid=001&eno=01&mid=s00000000018044036000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www13.a8.net/0.gif?a8mat=44WZEW+A7XWMQ+50+7A6FY9" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+A7XWMQ+50+7A9VEP" rel="nofollow">
+<img border="0" width="728" height="90" alt="" src="https://www24.a8.net/svt/bgt?aid=250122056618&wid=001&eno=01&mid=s00000000018044052000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=44WZEW+A7XWMQ+50+7A9VEP" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+ADAT2Q+CO4+2NA7NL" rel="nofollow">
+<img border="0" width="468" height="60" alt="" src="https://www25.a8.net/svt/bgt?aid=250122056627&wid=001&eno=01&mid=s00000001642016004000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www13.a8.net/0.gif?a8mat=44WZEW+ADAT2Q+CO4+2NA7NL" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+DCGTYQ+CO4+3H2J1T" rel="nofollow">
+<img border="0" width="468" height="60" alt="" src="https://www24.a8.net/svt/bgt?aid=250122056807&wid=001&eno=01&mid=s00000001642021007000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www14.a8.net/0.gif?a8mat=44WZEW+DCGTYQ+CO4+3H2J1T" alt="">`,
+        'adMax'
+    ];
+    const pc_tate_ads = [
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZES+CIP5PU+348+6NU9D" rel="nofollow">
+<img border="0" width="160" height="600" alt="" src="https://www27.a8.net/svt/bgt?aid=250122052757&wid=001&eno=01&mid=s00000000404001119000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=44WZES+CIP5PU+348+6NU9D" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZES+CQFSKY+348+1C5BOX" rel="nofollow">
+<img border="0" width="160" height="600" alt="" src="https://www26.a8.net/svt/bgt?aid=250122052770&wid=001&eno=01&mid=s00000000404008087000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=44WZES+CQFSKY+348+1C5BOX" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+64VU7M+50+7RY8CX" rel="nofollow">
+<img border="0" width="160" height="600" alt="" src="https://www29.a8.net/svt/bgt?aid=250122056371&wid=001&eno=01&mid=s00000000018047021000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=44WZEW+64VU7M+50+7RY8CX" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+A7XWMQ+50+79ZSR5" rel="nofollow">
+<img border="0" width="160" height="600" alt="" src="https://www25.a8.net/svt/bgt?aid=250122056618&wid=001&eno=01&mid=s00000000018044005000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www13.a8.net/0.gif?a8mat=44WZEW+A7XWMQ+50+79ZSR5" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+A7XWMQ+50+7AAQ9T" rel="nofollow">
+<img border="0" width="160" height="600" alt="" src="https://www28.a8.net/svt/bgt?aid=250122056618&wid=001&eno=01&mid=s00000000018044056000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=44WZEW+A7XWMQ+50+7AAQ9T" alt="">`,
+        'adMax'
+    ];
+
+    const pc_tate_ads2 = [
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZES+CDXOVM+4EKC+639IP" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=250122052749&wid=001&eno=01&mid=s00000020550001023000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=44WZES+CDXOVM+4EKC+639IP" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEV+9DKSS2+461Y+61C2P" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www27.a8.net/svt/bgt?aid=250122055567&wid=001&eno=01&mid=s00000019447001014000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=44WZEV+9DKSS2+461Y+61C2P" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+64VU7M+50+7RY0N5" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www24.a8.net/svt/bgt?aid=250122056371&wid=001&eno=01&mid=s00000000018047020000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=44WZEW+64VU7M+50+7RY0N5" alt="">`,
+        `<a href="https://px.a8.net/svt/ejp?a8mat=44WZEW+ADAT2Q+CO4+2NAN35" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www24.a8.net/svt/bgt?aid=250122056627&wid=001&eno=01&mid=s00000001642016006000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=44WZEW+ADAT2Q+CO4+2NAN35" alt="">`,
+        'adMax'
+    ];
+
+    // <div id="ads">の中身を更新する関数
+    function updateAd() {
+        let ad_ja_pc_num = 1;
+        let previousAds = {}; // 各スロットごとの前回の広告を記録
+        while (ad_ja_pc_num < 6) {
+            let randomAd;
+            if (ad_ja_pc_num == 1) {
+                // 横向き広告の選択
+                const availableAds = pc_yoko_ads.filter(ad => ad !== previousAds[ad_ja_pc_num]); // 前回広告を除外
+                randomAd = availableAds[Math.floor(Math.random() * availableAds.length)];
+            } else if (ad_ja_pc_num < 4) {
+                // 縦向き広告の選択
+                const availableAds = pc_tate_ads.filter(ad => ad !== previousAds[ad_ja_pc_num]); // 前回広告を除外
+                randomAd = availableAds[Math.floor(Math.random() * availableAds.length)];
+            } else if (ad_ja_pc_num < 6) {
+                // 横向き広告の選択
+                const availableAds = pc_tate_ads2.filter(ad => ad !== previousAds[ad_ja_pc_num]); // 前回広告を除外
+                randomAd = availableAds[Math.floor(Math.random() * availableAds.length)];
+            }
+
+            previousAds[ad_ja_pc_num] = randomAd; // 今回の広告を記録
+
+            const adsContainer = document.getElementById(`ad-japanese-pc${ad_ja_pc_num}`);
+            if (adsContainer) {
+                if (ad_ja_pc_num == 4) {
+                    console.log(randomAd)
+                }
+                if (randomAd === "adMax") {
+                    adsContainer.style.display = "none"; // 元の広告を非表示
+                    const adsContainer2 = document.getElementById(`ad-japanese-pc${ad_ja_pc_num}-2`);
+                    if (adsContainer2) adsContainer2.style.display = "block"; // 新しい広告を表示
+                } else {
+                    adsContainer.innerHTML = randomAd;
+                    adsContainer.style.display = "block"; // 元の広告を表示
+                    const adsContainer2 = document.getElementById(`ad-japanese-pc${ad_ja_pc_num}-2`);
+                    if (adsContainer2) adsContainer2.style.display = "none"; // 新しい広告を非表示
+                }
+            }
+            ad_ja_pc_num++;
+        }
+    }
+
+    // 最初の広告を表示
+    updateAd();
+
+    // 一定間隔で広告を変更（例: 5秒ごと）
+    setInterval(updateAd, 20000);
 });
 
 
