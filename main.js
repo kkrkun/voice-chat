@@ -7,25 +7,9 @@ let nowAd;
 const userLang = navigator.language || navigator.userLanguage;
 let lang = userLang.startsWith('ja') ? 'ja' : 'en';
 let isPC;
+let isMuted;
 
 document.addEventListener("DOMContentLoaded", function () {
-    function adBlockDetected() {
-        /*広告ブロッカー検知時の動作*/
-        document.getElementById("kk-detected").style.display = "flex";
-        console.log("広告ブロッカー検知");
-    }
-    function adBlockNotDetected() {
-        /*広告ブロッカー未検知時の動作*/
-        document.getElementById("kk-detected").style.display = "none";
-        console.log("広告ブロッカー未検知");
-    }
-    if (typeof blockAdBlock === "undefined") {
-    } else {
-        /*広告ブロッカー検知*/
-        blockAdBlock.onDetected(adBlockDetected);
-        /*広告ブロッカー未検知*/
-        blockAdBlock.onNotDetected(adBlockNotDetected);
-    }
 
     // 選択した言語のコンテンツを表示
     if (lang === 'ja') {
@@ -33,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('header-text').textContent = "近接VC in Mcbe";
         document.getElementById('name-disp').innerHTML = "ゲーマータグ: <span id='my-name'></span>";
         document.getElementById('Menber-disp').innerHTML = "参加人数: <span id='Members'>不明</span>";
-        document.getElementById('address').textContent = "アドレス: ";
+        document.getElementById('address').textContent = "ルームID: ";
         document.getElementById('gamertag').textContent = "ゲーマータグ: ";
         document.getElementById('join').textContent = "接続する";
         document.getElementById('NonMute-btn').textContent = "ミュートON/OFF";
@@ -93,11 +77,19 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('header-text').textContent = "近接VC in Mcbe";
             document.getElementById('name-disp').innerHTML = "ゲーマータグ: <span id='my-name'></span>";
             document.getElementById('Menber-disp').innerHTML = "参加人数: <span id='Members'>不明</span>";
-            document.getElementById('address').textContent = "アドレス: ";
+            document.getElementById('address').textContent = "ルームID: ";
             document.getElementById('gamertag').textContent = "ゲーマータグ: ";
             document.getElementById('join').textContent = "接続する";
             document.getElementById('NonMute-btn').textContent = "ミュートON/OFF";
             document.getElementById('MuteInfo').textContent = "接続されていません";
+            const now_mute = document.getElementById('MuteInfo');
+            const Memberselem = document.getElementById('Members');
+            if (now_mute.textContent === "Muted" || now_mute.textContent === "Unmuted") {
+                now_mute.textContent = isMuted ? "ミュート中" : "ミュート解除中";
+                Memberselem.textContent = Members + "人";
+            } else {
+                now_mute.textContent = "接続されていません";
+            }
             document.getElementById('leave').textContent = "退出";
             document.getElementById('participant').textContent = "参加者リスト";
             document.getElementById('switch-language').textContent = "Switch to English";
@@ -125,11 +117,18 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('header-text').textContent = "Proximity VC in Mcbe";
             document.getElementById('name-disp').innerHTML = "GamerTag: <span id='my-name'></span>";
             document.getElementById('Menber-disp').innerHTML = "Participants: <span id='Members'>undefined</span>";
-            document.getElementById('address').textContent = "Address: ";
+            document.getElementById('address').textContent = "ルームID: ";
             document.getElementById('gamertag').textContent = "GamerTag: ";
             document.getElementById('join').textContent = "Connect";
             document.getElementById('NonMute-btn').textContent = "Mute ON/OFF";
-            document.getElementById('MuteInfo').textContent = "Not connected";
+            const now_mute = document.getElementById('MuteInfo');
+            const Memberselem = document.getElementById('Members');
+            if (now_mute.textContent === "ミュート中" || now_mute.textContent === "ミュート解除中") {
+                now_mute.textContent = isMuted ? "Muted" : "Unmuted";
+                Memberselem.textContent = Members + "people";
+            } else {
+                now_mute.textContent = "Not connected";
+            }
             document.getElementById('leave').textContent = "Leave";
             document.getElementById('participant').textContent = "Participant List";
             document.getElementById('switch-language').textContent = "日本語に切り替え";
@@ -264,6 +263,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // 一定間隔で広告を変更（例: 5秒ごと）
     setInterval(updateAd, 20000);
 
+    function adBlockDetected() {
+        /*広告ブロッカー検知時の動作*/
+        document.getElementById("kk-detected").style.display = "flex";
+        console.log("広告ブロッカー検知");
+    }
+    function adBlockNotDetected() {
+        /*広告ブロッカー未検知時の動作*/
+        document.getElementById("kk-detected").style.display = "none";
+        console.log("広告ブロッカー未検知");
+    }
+    if (typeof blockAdBlock === "undefined") {
+    } else {
+        /*広告ブロッカー検知*/
+        blockAdBlock.onDetected(adBlockDetected);
+        /*広告ブロッカー未検知*/
+        blockAdBlock.onNotDetected(adBlockNotDetected);
+    }
     const continueWithoutAds = document.getElementById('continueWithout');
 
     continueWithoutAds.addEventListener('click', function () {
@@ -414,7 +430,7 @@ async function SkyWay_main(token, userName) {
     const leavebtn = document.getElementById('leave');
     const participantList = document.getElementById('participant-list');
 
-    let isMuted = false;
+    isMuted = false;
 
     const userPositions = {};
 
